@@ -27,12 +27,10 @@
 #include <array>
 #include <algorithm>
 
-namespace math
-{
+namespace math {
 
 template<typename T, size_t N>
-union matrix_tn
-{
+union matrix_tn {
     matrix_tn() :
       matrix_tn(static_cast<T>(0)) {}
 
@@ -52,10 +50,9 @@ union matrix_tn
 };
 
 template<typename T>
-union affine_t
-{
+union affine_t {
     affine_t() :
-      affine_t(static_cast<T>(0)) {}
+      E{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 } {}
 
     affine_t(T t)
     {
@@ -83,6 +80,55 @@ union affine_t
     std::array<T, 12> E{};
 };
 
-};     // namespace math
+template<typename T>
+matrix_tn<T, 3> quat_to_matrix(vector_tn<T, 4> q)
+{
+    matrix_tn<T, 3> m;
+    m.C[0] = { q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z, (q.x * q.y + q.z * q.w) * 2, (q.z * q.x - q.y * q.w) * 2 };
+    m.C[1] = { (q.x * q.y - q.z * q.w) * 2, q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z, (q.y * q.z + q.x * q.w) * 2 };
+    m.C[2] = { (q.z * q.x + q.y * q.w) * 2, (q.y * q.z - q.x * q.w) * 2, q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z };
+    return m;
+}
+
+template<typename T, size_t N>
+vector_tn<T, N> mul(const matrix_tn<T, N>& m, const vector_tn<T, N>& v)
+{
+    const auto e = [&]<std::size_t... I>(std::index_sequence<I...>)
+    {
+        return std::array<vector_tn<T, N>, N>{ std::get<I>(m.C) * std::get<I>(v.E)... };
+    }
+    (std::make_index_sequence<N>{});
+    auto result = e[0];
+    for (size_t i = 1; i < N; i++)
+        result += e[i];
+    return result;
+}
+
+template<typename T, size_t N>
+matrix_tn<T, N> mul(const matrix_tn<T, N>& a, const matrix_tn<T, N>& b)
+{
+    const auto e = [&]<std::size_t... I>(std::index_sequence<I...>)
+    {
+        return std::array<vector_tn<T, N>, N>{ mul(a, std::get<I>(b.C))... };
+    }
+    (std::make_index_sequence<N>{});
+    return { e };
+}
+
+template<typename T, size_t N>
+auto scale(const vector_tn<T, N>& v)
+{
+    matrix_tn<T, N> result;
+    for (size_t i = 0; i < N; i++)
+        result.E[i * i] = v.E[i];
+    return result;
+}
+
+// template<class T, int M> constexpr vec<T,M> mul(const mat<T,M,4> & a, const vec<T,4> & b) { return a.x*b.x + a.y*b.y + a.z*b.z + a.w*b.w; }
+// template<class T, int M, int N> constexpr mat<T,M,4> mul(const mat<T,M,N> & a, const mat<T,N,4> & b) { return {mul(a,b.x), mul(a,b.y), mul(a,b.z), mul(a,b.w)}; }
+
+using affinef = affine_t<float>;
+using affined = affine_t<double>;
+}; // namespace math
 
 #endif /* MATRIX_MATH_H */
