@@ -45,15 +45,11 @@ union vector_tn<T, 2>
 	vector_tn() : vector_tn(static_cast<T>(0)) {}
 	vector_tn(const T& t) : E{ t, t } {}
 	vector_tn(const T& _x, const T& _y) : E{ _x, _y } {}
+    vector_tn(const std::array<T, 2>& a) : E(a) {}
 	struct
 	{
 		T x;
 		T y;
-	};
-	struct
-	{
-		T r;
-		T g;
 	};
 	struct
 	{
@@ -76,21 +72,12 @@ union vector_tn<T, 3>
 	vector_tn(const T& _x, const T& _y, const T& _z) : E{ _x, _y, _z } {}
 	vector_tn(const vector_tn<T,2>& _xy, const T& _z) : E{ _xy.x, _xy.y, _z } {}
 	vector_tn(const T& _x, const vector_tn<T,2>& _yz) : E{ _x, _yz.x, _yz.y } {}
+    vector_tn(const std::array<T, 3>& a) : E(a) {}
 	struct
 	{
 		T x;
 		T y;
 		T z;
-	};
-	struct
-	{
-		vector_tn<T,2> xy0;
-		T z0;
-	};
-	struct
-	{
-		T x1;
-		vector_tn<T,2> yz1;
 	};
 	struct
 	{
@@ -100,29 +87,13 @@ union vector_tn<T, 3>
 	};
 	struct
 	{
-		vector_tn<T,2> rg0;
-		T b0;
-	};
-	struct
-	{
-		T r1;
-		vector_tn<T,2> gb1;
-	};
-	struct
-	{
 		T u;
 		T v;
 		T w;
 	};
 	struct
 	{
-		vector_tn<T,2> uv0;
-		T w0;
-	};
-	struct
-	{
-		T u1;
-		vector_tn<T,2> vw1;
+		vector_tn<T,2> uv;
 	};
 	std::array<T, 3> E{};
 };
@@ -139,45 +110,13 @@ union vector_tn<T, 4>
 	vector_tn(const T& _x, const vector_tn<T,3>& _yzw) : E{ _x, _yzw.x, _yzw.y, _yzw.z } {}
 	vector_tn(const T& _x, const vector_tn<T,2>& _yz, const T& _w) : E{ _x, _yz.x, _yz.y, _w } {}
 	vector_tn(const T& _x, const T& _y, const vector_tn<T,2>& _zw) : E{ _x, _y, _zw.x, _zw.y } {}
+    vector_tn(const std::array<T, 4>& a) : E(a) {}
 	struct
 	{
 		T x;
 		T y;
 		T z;
 		T w;
-	};
-	struct
-	{
-		vector_tn<T,2> xy0;
-		T z0;
-		T w0;
-	};
-	struct
-	{
-		vector_tn<T,3> xyz1;
-		T w1;
-	};
-	struct
-	{
-		vector_tn<T,2> xy;
-		vector_tn<T,2> zw;
-	};
-	struct
-	{
-		T x2;
-		vector_tn<T,3> yzw2;
-	};
-	struct
-	{
-		T x3;
-		vector_tn<T,2> yz3;
-		T w3;
-	};
-	struct
-	{
-		T x4;
-		T y4;
-		vector_tn<T,2> zw4;
 	};
 	struct
 	{
@@ -188,36 +127,19 @@ union vector_tn<T, 4>
 	};
 	struct
 	{
-		vector_tn<T,2> rg0;
-		T b0;
-		T a0;
+		vector_tn<T,3> xyz;
 	};
 	struct
 	{
-		vector_tn<T,3> rgb1;
-		T a1;
+		vector_tn<T,3> uvw;
 	};
 	struct
 	{
-		vector_tn<T,2> rg;
-		vector_tn<T,2> ba;
+		vector_tn<T,3> rgb;
 	};
 	struct
 	{
-		T r2;
-		vector_tn<T,3> gba2;
-	};
-	struct
-	{
-		T r3;
-		vector_tn<T,2> gb3;
-		T a3;
-	};
-	struct
-	{
-		T r4;
-		T g4;
-		vector_tn<T,2> ba4;
+		vector_tn<T,2> uv;
 	};
 	std::array<T, 4> E{};
 };
@@ -228,10 +150,10 @@ auto operator op (const vector_tn<Scalar, N>& lhs, const vector_tn<Scalar, N>& r
 { \
     auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
     { \
-        return vector_tn<Scalar, N>(std::get<I>(lhs.E) op std::get<I>(rhs.E)...); \
+        return std::array<Scalar, N>{std::get<I>(lhs.E) op std::get<I>(rhs.E)...}; \
     } \
     (std::make_index_sequence<N>{}); \
-    return result; \
+    return vector_tn<Scalar, N>(result); \
 }
 #define vectortn_scalar_arithmetic_op(op) \
 template<typename Scalar, size_t N> \
@@ -239,10 +161,10 @@ auto operator op (const vector_tn<Scalar, N>& lhs, const Scalar& rhs) \
 { \
     auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
     { \
-        return vector_tn<Scalar, N>(std::get<I>(lhs.E) op rhs...); \
+        return std::array<Scalar, N>{std::get<I>(lhs.E) op rhs...}; \
     } \
     (std::make_index_sequence<N>{}); \
-    return result; \
+    return vector_tn<Scalar, N>(result); \
 }
 #define scalar_vectortn_arithmetic_op(op) \
 template<typename Scalar, size_t N> \
@@ -250,10 +172,10 @@ auto operator op (const Scalar& lhs, const vector_tn<Scalar, N>& rhs) \
 { \
     auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
     { \
-        return vector_tn<Scalar, N>(lhs op std::get<I>(rhs.E)...); \
+        return std::array<Scalar, N>{lhs op std::get<I>(rhs.E)...}; \
     } \
     (std::make_index_sequence<N>{}); \
-    return result; \
+    return vector_tn<Scalar, N>(result); \
 }
 
 #define vectortn_arithmetic_op(op) \
@@ -389,7 +311,7 @@ auto distance_squared(const vector_tn<T, N>& a, const vector_tn<T, N>& b)
 }
 
 template<typename T, size_t N>
-auto distance(const vector_tn<T, N>& a, const T& b)
+auto distance(const vector_tn<T, N>& a, const vector_tn<T, N>& b)
 {
     const auto result = length(a - b);
     return result;
