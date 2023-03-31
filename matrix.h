@@ -82,7 +82,7 @@ union matrix<T, 4, 4> {
       Columns(c) {}
 
     matrix(const vector<T, 4>& _x, const vector<T, 4>& _y, const vector<T, 4>& _z, const vector<T, 4>& _w) :
-      x(_x), y(_y), z(_z), w(_w)  {}
+      x(_x), y(_y), z(_z), w(_w) {}
 
     std::array<vector<T, 4>, 4> Columns;
     std::array<T, 16> Elements{};
@@ -238,9 +238,8 @@ constexpr matrix<T, N, N> inverse(const matrix<T, N, N>& a)
     const auto adj = adjugate(a);
     const auto det = determinant(a);
     matrix<T, N, N> result;
-    for (size_t i = 0; i < result.Elements.size(); i++) {
+    for (size_t i = 0; i < result.Elements.size(); i++)
         result.Elements[i] = adj.Elements[i] / det;
-    }
     return result;
 }
 
