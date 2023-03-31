@@ -36,7 +36,7 @@ auto map(const T x, const T in_min, const T in_max, const T out_min, const T out
 }
 
 template<typename T, size_t N>
-auto map(const T x, const vector_tn<T, N>& in_min, const vector_tn<T, N>& in_max, const vector_tn<T, N>& out_min, const vector_tn<T, N>& out_max)
+auto map(const T x, const vector<T, N>& in_min, const vector<T, N>& in_max, const vector<T, N>& out_min, const vector<T, N>& out_max)
 {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
@@ -48,7 +48,7 @@ auto lerp(const T x, const T a, const T b)
 }
 
 template<typename T, size_t N>
-auto lerp(const T x, const vector_tn<T, N>& a, const vector_tn<T, N>& b)
+auto lerp(const T x, const vector<T, N>& a, const vector<T, N>& b)
 {
     return (T(1) - x) * a + x * b;
 }
@@ -62,7 +62,7 @@ auto clamp(const T x, const T min, const T max)
 }
 
 template<size_t N>
-bool all_true(vector_tn<bool, N> t)
+bool all_true(vector<bool, N> t)
 {
     bool result = std::apply([](auto&&...v)
                              { return (v && ...); },
@@ -71,7 +71,7 @@ bool all_true(vector_tn<bool, N> t)
 }
 
 template<size_t N>
-bool any_true(vector_tn<bool, N> t)
+bool any_true(vector<bool, N> t)
 {
     bool result = std::apply([](auto&&...v)
                              { return (v || ...); },
@@ -80,16 +80,16 @@ bool any_true(vector_tn<bool, N> t)
 }
 
 template<typename T>
-auto make_otho_normal_base(const vector_tn<T, 3>& normal)
+auto make_otho_normal_base(const vector<T, 3>& normal)
 {
     // pixar technique
     // do not use sign(n.z), it can produce 0.0
     const auto sign_z = normal.z >= 0.f ? static_cast<T>(1) : static_cast<T>(-1);
     const auto a = static_cast<T>(-1) / (sign_z + normal.z);
     const auto b = normal.x * normal.y * a;
-    const auto tangent = vector_tn<T, 3>(static_cast<T>(1) + sign_z * normal.x * normal.x * a, sign_z * b, -sign_z * normal.x);
-    const auto bi_tangent = vector_tn<T, 3>(b, sign_z + normal.y * normal.y * a, -normal.y);
-    return matrix_tn<T, 3>({ tangent, bi_tangent, normal });
+    const auto tangent = vector<T, 3>(static_cast<T>(1) + sign_z * normal.x * normal.x * a, sign_z * b, -sign_z * normal.x);
+    const auto bi_tangent = vector<T, 3>(b, sign_z + normal.y * normal.y * a, -normal.y);
+    return matrix<T, 3,3>({ tangent, bi_tangent, normal });
 }
 
 } // namespace math

@@ -32,45 +32,45 @@ namespace math
 {
 
 template<typename T, size_t N>
-struct bounds_tn
+struct bounds
 {
-    bounds_tn() :
+    bounds() :
       min(std::numeric_limits<T>::max()), max(-std::numeric_limits<T>::max()) {}
 
     template<typename... Ts>
-    bounds_tn(const vector_tn<T, N>& t, const Ts&...args) :
+    bounds(const vector<T, N>& t, const Ts&...args) :
       min(t), max(t)
     {
         constexpr auto Size = sizeof...(args);
-        const std::array<vector_tn<T, N>, Size> items{ vector_tn<T, N>(args)... };
+        const std::array<vector<T, N>, Size> items{ vector<T, N>(args)... };
         for (const auto& v : items)
             extend(v);
     }
 
-    auto extend(const bounds_tn<T, N>& t)
+    auto extend(const bounds<T, N>& t)
     {
         min = math::min(min, t.min);
         max = math::max(max, t.max);
     }
 
-    auto extend(const vector_tn<T, N>& t)
+    auto extend(const vector<T, N>& t)
     {
         min = math::min(min, t);
         max = math::max(max, t);
     }
 
-    vector_tn<T, N> volume() const
+    vector<T, N> volume() const
     {
         auto result = max - min;
         return result;
     }
 
-    vector_tn<T, N> min, max;
+    vector<T, N> min, max;
 };
 
-using bounds2 = bounds_tn<float, 2>;
-using bounds3 = bounds_tn<float, 3>;
-using bounds4 = bounds_tn<float, 4>;
+using bounds2 = bounds<float, 2>;
+using bounds3 = bounds<float, 3>;
+using bounds4 = bounds<float, 4>;
 
 }
 
