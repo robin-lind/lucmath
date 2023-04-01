@@ -40,6 +40,17 @@ union vector
     vector(const std::array<T, N>& a) : values(a) {}
     std::array<T, N> values{};
 };
+
+template<typename T>
+union vector<T, 1>
+{
+	vector() : vector(static_cast<T>(0)) {}
+	vector(const T& t) : values{ t } {}
+    vector(const std::array<T, 1>& a) : values(a) {}
+	T t;
+	std::array<T, 1> values{};
+};
+
 template<typename T>
 union vector<T, 2>
 {
