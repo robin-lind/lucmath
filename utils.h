@@ -26,8 +26,7 @@
 #include "vector.h"
 #include <utility>
 
-namespace math
-{
+namespace math {
 
 template<typename T>
 auto map(const T x, const T in_min, const T in_max, const T out_min, const T out_max)
@@ -61,21 +60,27 @@ auto clamp(const T x, const T min, const T max)
     return x;
 }
 
+template<typename T>
+auto wrap(const T x, const T inclusive_min, const T exclusive_max)
+{
+    const auto range = exclusive_max - inclusive_min;
+    auto result = x;
+    while (result < inclusive_min) result += range;
+    while (result >= exclusive_max) result -= range;
+    return result;
+}
+
 template<size_t N>
 bool all_true(vector<bool, N> t)
 {
-    bool result = std::apply([](auto&&...v)
-                             { return (v && ...); },
-                             t.values);
+    bool result = std::apply([](auto&&...v) { return (v && ...); }, t.values);
     return result;
 }
 
 template<size_t N>
 bool any_true(vector<bool, N> t)
 {
-    bool result = std::apply([](auto&&...v)
-                             { return (v || ...); },
-                             t.values);
+    bool result = std::apply([](auto&&...v) { return (v || ...); }, t.values);
     return result;
 }
 
@@ -89,7 +94,7 @@ auto make_otho_normal_base(const vector<T, 3>& normal)
     const auto b = normal.x * normal.y * a;
     const auto tangent = vector<T, 3>(static_cast<T>(1) + sign_z * normal.x * normal.x * a, sign_z * b, -sign_z * normal.x);
     const auto bi_tangent = vector<T, 3>(b, sign_z + normal.y * normal.y * a, -normal.y);
-    return matrix<T, 3,3>({ tangent, bi_tangent, normal });
+    return matrix<T, 3, 3>({ tangent, bi_tangent, normal });
 }
 
 } // namespace math
