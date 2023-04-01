@@ -27,6 +27,7 @@
 #include <array>
 #include <functional>
 #include <limits>
+#include <cstdint>
 
 namespace math
 {
@@ -241,6 +242,10 @@ using double2 = vector<double,2>;
 using double3 = vector<double,3>;
 using double4 = vector<double,4>;
 
+using short2 = vector<int16_t,2>;
+using short3 = vector<int16_t,3>;
+using short4 = vector<int16_t,4>;
+
 using int2 = vector<int32_t,2>;
 using int3 = vector<int32_t,3>;
 using int4 = vector<int32_t,4>;
@@ -248,6 +253,18 @@ using int4 = vector<int32_t,4>;
 using long2 = vector<int64_t,2>;
 using long3 = vector<int64_t,3>;
 using long4 = vector<int64_t,4>;
+
+using ushort2 = vector<uint16_t,2>;
+using ushort3 = vector<uint16_t,3>;
+using ushort4 = vector<uint16_t,4>;
+
+using uint2 = vector<uint32_t,2>;
+using uint3 = vector<uint32_t,3>;
+using uint4 = vector<uint32_t,4>;
+
+using ulong2 = vector<uint64_t,2>;
+using ulong3 = vector<uint64_t,3>;
+using ulong4 = vector<uint64_t,4>;
 
 using bool2 = vector<bool,2>;
 using bool3 = vector<bool,3>;
