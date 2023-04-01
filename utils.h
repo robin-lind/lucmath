@@ -40,16 +40,10 @@ auto map(const T x, const vector<T, N>& in_min, const vector<T, N>& in_max, cons
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-template<typename T>
-auto lerp(const T x, const T a, const T b)
+template<typename T, typename U>
+auto lerp(const U x, const T a, const T b)
 {
-    return (T(1) - x) * a + x * b;
-}
-
-template<typename T, size_t N>
-auto lerp(const T x, const vector<T, N>& a, const vector<T, N>& b)
-{
-    return (T(1) - x) * a + x * b;
+    return (U(1) - x) * a + x * b;
 }
 
 template<typename T>
