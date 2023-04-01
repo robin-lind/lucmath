@@ -137,7 +137,7 @@ vector<T, R> mul(const matrix<T, R, C>& m, const vector<T, R>& v)
 {
     const auto e = [&]<std::size_t... I>(std::index_sequence<I...>)
     {
-        return std::array<vector<T, R>, C>{ std::get<I>(m.columns) * std::get<I>(v.E)... };
+        return std::array<vector<T, R>, C>{ std::get<I>(m.columns) * std::get<I>(v.values)... };
     }
     (std::make_index_sequence<C>{});
     auto result = e[0];
@@ -164,9 +164,9 @@ auto scale(const vector<T, N>& v)
     constexpr auto countN = std::min(countRC, N);
     matrix<T, R, C> result;
     for (size_t i = 0; i < countRC; i++)
-        result.columns[i].E[i] = static_cast<T>(1);
+        result.columns[i].values[i] = static_cast<T>(1);
     for (size_t i = 0; i < countN; i++)
-        result.columns[i].E[i] = v.E[i];
+        result.columns[i].values[i] = v.values[i];
     return result;
 }
 
@@ -184,7 +184,7 @@ auto transpose(const matrix<T, R, C>& m)
     matrix<T, C, R> result;
     for (size_t c = 0; c < C; c++)
         for (size_t r = 0; r < R; r++)
-            result.columns[r].E[c] = m.columns[c].E[r];
+            result.columns[r].values[c] = m.columns[c].values[r];
     return result;
 }
 
@@ -267,7 +267,7 @@ constexpr matrix<T, N, N> inverse(const matrix<T, N, N>& a)
     const auto det = determinant(a);
     matrix<T, N, N> result;
     for (size_t i = 0; i < result.values.size(); i++)
-        result.values[i] = adj.Elements[i] / det;
+        result.values[i] = adj.values[i] / det;
     return result;
 }
 

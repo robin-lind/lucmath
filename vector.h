@@ -36,17 +36,17 @@ template<typename T, size_t N>
 union vector
 {
     vector() : vector(static_cast<T>(0)) {}
-    vector(const T& t) { std::fill(std::begin(E), std::end(E), t); }
-    vector(const std::array<T, N>& a) : E(a) {}
-    std::array<T, N> E{};
+    vector(const T& t) { std::fill(std::begin(values), std::end(values), t); }
+    vector(const std::array<T, N>& a) : values(a) {}
+    std::array<T, N> values{};
 };
 template<typename T>
 union vector<T, 2>
 {
 	vector() : vector(static_cast<T>(0)) {}
-	vector(const T& t) : E{ t, t } {}
-	vector(const T& _x, const T& _y) : E{ _x, _y } {}
-    vector(const std::array<T, 2>& a) : E(a) {}
+	vector(const T& t) : values{ t, t } {}
+	vector(const T& _x, const T& _y) : values{ _x, _y } {}
+    vector(const std::array<T, 2>& a) : values(a) {}
 	struct
 	{
 		T x;
@@ -62,18 +62,18 @@ union vector<T, 2>
 		T w;
 		T h;
 	};
-	std::array<T, 2> E{};
+	std::array<T, 2> values{};
 };
 
 template<typename T>
 union vector<T, 3>
 {
 	vector() : vector(static_cast<T>(0)) {}
-	vector(const T& t) : E{ t, t, t } {}
-	vector(const T& _x, const T& _y, const T& _z) : E{ _x, _y, _z } {}
-	vector(const vector<T,2>& _xy, const T& _z) : E{ _xy.x, _xy.y, _z } {}
-	vector(const T& _x, const vector<T,2>& _yz) : E{ _x, _yz.x, _yz.y } {}
-    vector(const std::array<T, 3>& a) : E(a) {}
+	vector(const T& t) : values{ t, t, t } {}
+	vector(const T& _x, const T& _y, const T& _z) : values{ _x, _y, _z } {}
+	vector(const vector<T,2>& _xy, const T& _z) : values{ _xy.x, _xy.y, _z } {}
+	vector(const T& _x, const vector<T,2>& _yz) : values{ _x, _yz.x, _yz.y } {}
+    vector(const std::array<T, 3>& a) : values(a) {}
 	struct
 	{
 		T x;
@@ -96,22 +96,22 @@ union vector<T, 3>
 	{
 		vector<T,2> uv;
 	};
-	std::array<T, 3> E{};
+	std::array<T, 3> values{};
 };
 
 template<typename T>
 union vector<T, 4>
 {
 	vector() : vector(static_cast<T>(0)) {}
-	vector(const T& t) : E{ t, t, t, t } {}
-	vector(const T& _x, const T& _y, const T& _z, const T& _w) : E{ _x, _y, _z, _w } {}
-	vector(const vector<T,2>& _xy, const T& _z, const T& _w) : E{ _xy.x, _xy.y, _z, _w } {}
-	vector(const vector<T,3>& _xyz, const T& _w) : E{ _xyz.x, _xyz.y, _xyz.z, _w } {}
-	vector(const vector<T,2>& _xy, const vector<T,2>& _zw) : E{ _xy.x, _xy.y, _zw.x, _zw.y } {}
-	vector(const T& _x, const vector<T,3>& _yzw) : E{ _x, _yzw.x, _yzw.y, _yzw.z } {}
-	vector(const T& _x, const vector<T,2>& _yz, const T& _w) : E{ _x, _yz.x, _yz.y, _w } {}
-	vector(const T& _x, const T& _y, const vector<T,2>& _zw) : E{ _x, _y, _zw.x, _zw.y } {}
-    vector(const std::array<T, 4>& a) : E(a) {}
+	vector(const T& t) : values{ t, t, t, t } {}
+	vector(const T& _x, const T& _y, const T& _z, const T& _w) : values{ _x, _y, _z, _w } {}
+	vector(const vector<T,2>& _xy, const T& _z, const T& _w) : values{ _xy.x, _xy.y, _z, _w } {}
+	vector(const vector<T,3>& _xyz, const T& _w) : values{ _xyz.x, _xyz.y, _xyz.z, _w } {}
+	vector(const vector<T,2>& _xy, const vector<T,2>& _zw) : values{ _xy.x, _xy.y, _zw.x, _zw.y } {}
+	vector(const T& _x, const vector<T,3>& _yzw) : values{ _x, _yzw.x, _yzw.y, _yzw.z } {}
+	vector(const T& _x, const vector<T,2>& _yz, const T& _w) : values{ _x, _yz.x, _yz.y, _w } {}
+	vector(const T& _x, const T& _y, const vector<T,2>& _zw) : values{ _x, _y, _zw.x, _zw.y } {}
+    vector(const std::array<T, 4>& a) : values(a) {}
 	struct
 	{
 		T x;
@@ -142,7 +142,7 @@ union vector<T, 4>
 	{
 		vector<T,2> uv;
 	};
-	std::array<T, 4> E{};
+	std::array<T, 4> values{};
 };
 
 #define vector_vector_arithmetic_op(op) \
@@ -151,7 +151,7 @@ auto operator op (const vector<T, N>& lhs, const vector<T, N>& rhs) \
 { \
     auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
     { \
-        return std::array<T, N>{std::get<I>(lhs.E) op std::get<I>(rhs.E)...}; \
+        return std::array<T, N>{std::get<I>(lhs.values) op std::get<I>(rhs.values)...}; \
     } \
     (std::make_index_sequence<N>{}); \
     return vector<T, N>(result); \
@@ -162,7 +162,7 @@ auto operator op (const vector<T, N>& lhs, const T& rhs) \
 { \
     auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
     { \
-        return std::array<T, N>{std::get<I>(lhs.E) op rhs...}; \
+        return std::array<T, N>{std::get<I>(lhs.values) op rhs...}; \
     } \
     (std::make_index_sequence<N>{}); \
     return vector<T, N>(result); \
@@ -173,7 +173,7 @@ auto operator op (const T& lhs, const vector<T, N>& rhs) \
 { \
     auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
     { \
-        return std::array<T, N>{lhs op std::get<I>(rhs.E)...}; \
+        return std::array<T, N>{lhs op std::get<I>(rhs.values)...}; \
     } \
     (std::make_index_sequence<N>{}); \
     return vector<T, N>(result); \
@@ -228,7 +228,7 @@ auto operator-(const vector<T, N>& t)
 {
     auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
     {
-        return vector<T, N>(-std::get<I>(t.E)...);
+        return vector<T, N>(-std::get<I>(t.values)...);
     }
     (std::make_index_sequence<N>{});
     return result;
@@ -281,9 +281,9 @@ auto collapse(const vector<T, N>& a)
         return Op{}(Op{}(Op{}(a.x, a.y), a.z), a.w);
     else if constexpr (N > 4)
     {
-        T result = a.E[0];
+        T result = a.values[0];
         for (size_t i = 1; i < N; i++)
-            result = Op{}(result, a.E[i]);
+            result = Op{}(result, a.values[i]);
         return result;
     }
 }
@@ -353,7 +353,7 @@ auto min(const vector<T, N>& t, const vector<T, N>& u)
 {
     auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
     {
-        return vector<T, N>(std::min(std::get<I>(t.E), std::get<I>(u.E))...);
+        return vector<T, N>(std::min(std::get<I>(t.values), std::get<I>(u.values))...);
     }
     (std::make_index_sequence<N>{});
     return result;
@@ -364,7 +364,7 @@ auto max(const vector<T, N>& t, const vector<T, N>& u)
 {
     auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
     {
-        return vector<T, N>(std::max(std::get<I>(t.E), std::get<I>(u.E))...);
+        return vector<T, N>(std::max(std::get<I>(t.values), std::get<I>(u.values))...);
     }
     (std::make_index_sequence<N>{});
     return result;

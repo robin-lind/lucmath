@@ -66,7 +66,7 @@ bool all_true(vector<bool, N> t)
 {
     bool result = std::apply([](auto&&...v)
                              { return (v && ...); },
-                             t.E);
+                             t.values);
     return result;
 }
 
@@ -75,7 +75,7 @@ bool any_true(vector<bool, N> t)
 {
     bool result = std::apply([](auto&&...v)
                              { return (v || ...); },
-                             t.E);
+                             t.values);
     return result;
 }
 
