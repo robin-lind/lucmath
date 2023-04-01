@@ -52,17 +52,45 @@ union matrix {
 
     matrix(T t)
     {
-        std::fill(std::begin(Elements), std::end(Elements), t);
+        std::fill(std::begin(values), std::end(values), t);
     }
 
     matrix(const std::array<T, R * C>& a) :
-      Elements(a) {}
+      values(a) {}
 
     matrix(const std::array<vector<T, R>, C>& c) :
-      Columns(c) {}
+      columns(c) {}
 
-    std::array<vector<T, R>, C> Columns;
-    std::array<T, R * C> Elements{};
+    std::array<vector<T, R>, C> columns;
+    std::array<T, R * C> values{};
+};
+
+template<typename T>
+union matrix<T, 3, 3> {
+    matrix() :
+      matrix(identity<T, 3, 3>()) {}
+
+    matrix(T t)
+    {
+        std::fill(std::begin(values), std::end(values), t);
+    }
+
+    matrix(const std::array<T, 9>& a) :
+      values(a) {}
+
+    matrix(const std::array<vector<T, 3>, 3>& c) :
+      columns(c) {}
+
+    matrix(const vector<T, 3>& _x, const vector<T, 3>& _y, const vector<T, 3>& _z) :
+      x(_x), y(_y), z(_z) {}
+
+    std::array<vector<T, 3>, 3> columns;
+    std::array<T, 9> values{};
+
+    struct
+    {
+        vector<T, 3> x, y, z;
+    };
 };
 
 template<typename T>
@@ -72,20 +100,20 @@ union matrix<T, 4, 4> {
 
     matrix(T t)
     {
-        std::fill(std::begin(Elements), std::end(Elements), t);
+        std::fill(std::begin(values), std::end(values), t);
     }
 
     matrix(const std::array<T, 16>& a) :
-      Elements(a) {}
+      values(a) {}
 
     matrix(const std::array<vector<T, 4>, 4>& c) :
-      Columns(c) {}
+      columns(c) {}
 
     matrix(const vector<T, 4>& _x, const vector<T, 4>& _y, const vector<T, 4>& _z, const vector<T, 4>& _w) :
       x(_x), y(_y), z(_z), w(_w) {}
 
-    std::array<vector<T, 4>, 4> Columns;
-    std::array<T, 16> Elements{};
+    std::array<vector<T, 4>, 4> columns;
+    std::array<T, 16> values{};
 
     struct
     {
@@ -109,7 +137,7 @@ vector<T, R> mul(const matrix<T, R, C>& m, const vector<T, R>& v)
 {
     const auto e = [&]<std::size_t... I>(std::index_sequence<I...>)
     {
-        return std::array<vector<T, R>, C>{ std::get<I>(m.Columns) * std::get<I>(v.E)... };
+        return std::array<vector<T, R>, C>{ std::get<I>(m.columns) * std::get<I>(v.E)... };
     }
     (std::make_index_sequence<C>{});
     auto result = e[0];
@@ -123,7 +151,7 @@ matrix<T, R, C> mul(const matrix<T, R, C>& a, const matrix<T, R, C>& b)
 {
     const auto e = [&]<std::size_t... I>(std::index_sequence<I...>)
     {
-        return std::array<vector<T, R>, C>{ mul(a, std::get<I>(b.Columns))... };
+        return std::array<vector<T, R>, C>{ mul(a, std::get<I>(b.columns))... };
     }
     (std::make_index_sequence<C>{});
     return { e };
@@ -136,9 +164,9 @@ auto scale(const vector<T, N>& v)
     constexpr auto countN = std::min(countRC, N);
     matrix<T, R, C> result;
     for (size_t i = 0; i < countRC; i++)
-        result.Columns[i].E[i] = static_cast<T>(1);
+        result.columns[i].E[i] = static_cast<T>(1);
     for (size_t i = 0; i < countN; i++)
-        result.Columns[i].E[i] = v.E[i];
+        result.columns[i].E[i] = v.E[i];
     return result;
 }
 
@@ -156,7 +184,7 @@ auto transpose(const matrix<T, R, C>& m)
     matrix<T, C, R> result;
     for (size_t c = 0; c < C; c++)
         for (size_t r = 0; r < R; r++)
-            result.Columns[r].E[c] = m.Columns[c].E[r];
+            result.columns[r].E[c] = m.columns[c].E[r];
     return result;
 }
 
@@ -238,8 +266,8 @@ constexpr matrix<T, N, N> inverse(const matrix<T, N, N>& a)
     const auto adj = adjugate(a);
     const auto det = determinant(a);
     matrix<T, N, N> result;
-    for (size_t i = 0; i < result.Elements.size(); i++)
-        result.Elements[i] = adj.Elements[i] / det;
+    for (size_t i = 0; i < result.values.size(); i++)
+        result.values[i] = adj.Elements[i] / det;
     return result;
 }
 
@@ -251,6 +279,7 @@ std::pair<vector<T, 3>, vector<T, 3>> transform_ray(const matrix<T, 4, 4>& trans
     return std::make_pair(_org.xyz, _dir.xyz);
 }
 
+using matrix3 = matrix<float, 3, 3>;
 using matrix4 = matrix<float, 4, 4>;
 
 }; // namespace math
