@@ -79,17 +79,31 @@ bool any_true(vector<bool, N> t)
 }
 
 template<typename T>
-auto make_otho_normal_base(const vector<T, 3>& normal)
-{
-    // pixar technique
-    // do not use sign(n.z), it can produce 0.0
-    const auto sign_z = normal.z >= 0.f ? static_cast<T>(1) : static_cast<T>(-1);
-    const auto a = static_cast<T>(-1) / (sign_z + normal.z);
-    const auto b = normal.x * normal.y * a;
-    const auto tangent = vector<T, 3>(static_cast<T>(1) + sign_z * normal.x * normal.x * a, sign_z * b, -sign_z * normal.x);
-    const auto bi_tangent = vector<T, 3>(b, sign_z + normal.y * normal.y * a, -normal.y);
-    return matrix<T, 3, 3>({ tangent, bi_tangent, normal });
-}
+struct ortho_normal_base {
+    vector<T, 3> tangent, bi_tangent, normal;
+
+    ortho_normal_base() = default;
+
+    ortho_normal_base(const vector<T, 3>& normal) :
+      normal(normal)
+    {
+        const auto sign_z = normal.z >= 0 ? static_cast<T>(1) : static_cast<T>(-1);
+        const auto a = static_cast<T>(-1) / (sign_z + normal.z);
+        const auto b = normal.x * normal.y * a;
+        tangent = vector<T, 3>(static_cast<T>(1) + sign_z * normal.x * normal.x * a, sign_z * b, -sign_z * normal.x);
+        bi_tangent = vector<T, 3>(b, sign_z + normal.y * normal.y * a, -normal.y);
+    }
+
+    vector<T, 3> to_local(const vector<T, 3>& dir) const
+    {
+        return { dot(dir, tangent), dot(dir, bi_tangent), dot(dir, normal) };
+    }
+
+    vector<T, 3> to_world(const vector<T, 3>& dir) const
+    {
+        return dir.x * tangent + dir.y * bi_tangent + dir.z * normal;
+    }
+};
 
 } // namespace math
 
