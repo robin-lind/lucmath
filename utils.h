@@ -28,26 +28,20 @@
 
 namespace math {
 
-template<typename T>
-auto map(const T x, const T in_min, const T in_max, const T out_min, const T out_max)
-{
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-
-template<typename T, size_t N>
-auto map(const T x, const vector<T, N>& in_min, const vector<T, N>& in_max, const vector<T, N>& out_min, const vector<T, N>& out_max)
+template<typename T, typename U>
+constexpr auto map(const T x, const U in_min, const U in_max, const U out_min, const U out_max)
 {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 template<typename T, typename U>
-auto lerp(const U x, const T a, const T b)
+constexpr auto lerp(const T x, const U a, const U b)
 {
-    return (U(1) - x) * a + x * b;
+    return (T(1) - x) * a + x * b;
 }
 
 template<typename T>
-auto clamp(const T x, const T min, const T max)
+constexpr auto clamp(const T x, const T min, const T max)
 {
     if (x < min) return min;
     if (x > max) return max;
