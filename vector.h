@@ -160,7 +160,7 @@ union vector<T, 4>
 template<typename T, size_t N> \
 auto operator op (const vector<T, N>& lhs, const vector<T, N>& rhs) \
 { \
-    auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
     { \
         return std::array<T, N>{std::get<I>(lhs.values) op std::get<I>(rhs.values)...}; \
     } \
@@ -171,7 +171,7 @@ auto operator op (const vector<T, N>& lhs, const vector<T, N>& rhs) \
 template<typename T, size_t N> \
 auto operator op (const vector<T, N>& lhs, const T& rhs) \
 { \
-    auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
     { \
         return std::array<T, N>{std::get<I>(lhs.values) op rhs...}; \
     } \
@@ -182,7 +182,7 @@ auto operator op (const vector<T, N>& lhs, const T& rhs) \
 template<typename T, size_t N> \
 auto operator op (const T& lhs, const vector<T, N>& rhs) \
 { \
-    auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
     { \
         return std::array<T, N>{lhs op std::get<I>(rhs.values)...}; \
     } \
@@ -237,12 +237,12 @@ every_assignment_op(vector_assignment_op)
 template<typename T, size_t N>
 auto operator-(const vector<T, N>& t)
 {
-    auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
+	const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
     {
-        return vector<T, N>(-std::get<I>(t.values)...);
+        return std::array<T, N>{-std::get<I>(t.values)...};
     }
     (std::make_index_sequence<N>{});
-    return result;
+    return vector<T, N>(result);
 }
 
 using float2 = vector<float,2>;
@@ -362,23 +362,23 @@ auto normalized_with_length(const vector<T, N>& a)
 template<typename T, size_t N>
 auto min(const vector<T, N>& t, const vector<T, N>& u)
 {
-    auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
+	const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
     {
-        return vector<T, N>(std::min(std::get<I>(t.values), std::get<I>(u.values))...);
+        return std::array<T, N>{std::min(std::get<I>(t.values), std::get<I>(u.values))...};
     }
     (std::make_index_sequence<N>{});
-    return result;
+    return vector<T, N>(result);
 }
 
 template<typename T, size_t N>
 auto max(const vector<T, N>& t, const vector<T, N>& u)
 {
-    auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
+	const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
     {
-        return vector<T, N>(std::max(std::get<I>(t.values), std::get<I>(u.values))...);
+        return std::array<T, N>{std::max(std::get<I>(t.values), std::get<I>(u.values))...};
     }
     (std::make_index_sequence<N>{});
-    return result;
+    return vector<T, N>(result);
 }
 
 }; // namespace math

@@ -24,6 +24,7 @@
 #define UTILS_MATH_H
 
 #include "vector.h"
+#include <cmath>
 #include <utility>
 
 namespace math {
@@ -58,17 +59,36 @@ auto wrap(const T x, const T inclusive_min, const T exclusive_max)
     return result;
 }
 
+template<typename T>
+constexpr auto sanitize(const T x)
+{
+    if (std::isfinite(x))
+        return x;
+    return T(0);
+}
+
+template<typename T, size_t N>
+constexpr auto sanitize(const vector<T, N>& v)
+{
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
+    {
+        return std::array<T, N>{ sanitize(std::get<I>(v.values))... };
+    }
+    (std::make_index_sequence<N>{});
+    return vector<T, N>(result);
+}
+
 template<size_t N>
 bool all_true(vector<bool, N> t)
 {
-    bool result = std::apply([](auto&&...v) { return (v && ...); }, t.values);
+    const bool result = std::apply([](auto&&...v) { return (v && ...); }, t.values);
     return result;
 }
 
 template<size_t N>
 bool any_true(vector<bool, N> t)
 {
-    bool result = std::apply([](auto&&...v) { return (v || ...); }, t.values);
+    const bool result = std::apply([](auto&&...v) { return (v || ...); }, t.values);
     return result;
 }
 
