@@ -49,6 +49,8 @@ union vector<T, 1>
     vector(const std::array<T, 1>& a) : values(a) {}
 	T t;
 	std::array<T, 1> values{};
+    operator T&() { return t; }
+    operator T() const { return t; }
 };
 
 template<typename T>

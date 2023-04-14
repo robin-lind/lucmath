@@ -78,6 +78,13 @@ constexpr auto sanitize(const vector<T, N>& v)
     return vector<T, N>(result);
 }
 
+template<typename T>
+auto reflect(const vector<T, 3>& w, const vector<T, 3>& n)
+{
+    const auto result = n * (math::dot(n, w) * static_cast<T>(2)) - w;
+    return result;
+}
+
 template<size_t N>
 bool all_true(vector<bool, N> t)
 {
