@@ -35,7 +35,7 @@ namespace math
 template<typename T, size_t N>
 union vector
 {
-    vector() : vector(static_cast<T>(0)) {}
+    vector() : vector(T()) {}
     vector(const T& t) { std::fill(std::begin(values), std::end(values), t); }
     vector(const std::array<T, N>& a) : values(a) {}
     std::array<T, N> values{};
@@ -44,7 +44,7 @@ union vector
 template<typename T>
 union vector<T, 1>
 {
-	vector() : vector(static_cast<T>(0)) {}
+	vector() : vector(T()) {}
 	vector(const T& t) : values{ t } {}
     vector(const std::array<T, 1>& a) : values(a) {}
 	T t;
@@ -56,7 +56,7 @@ union vector<T, 1>
 template<typename T>
 union vector<T, 2>
 {
-	vector() : vector(static_cast<T>(0)) {}
+	vector() : vector(T()) {}
 	vector(const T& t) : values{ t, t } {}
 	vector(const T& _x, const T& _y) : values{ _x, _y } {}
     vector(const std::array<T, 2>& a) : values(a) {}
@@ -81,7 +81,7 @@ union vector<T, 2>
 template<typename T>
 union vector<T, 3>
 {
-	vector() : vector(static_cast<T>(0)) {}
+	vector() : vector(T()) {}
 	vector(const T& t) : values{ t, t, t } {}
 	vector(const T& _x, const T& _y, const T& _z) : values{ _x, _y, _z } {}
 	vector(const vector<T,2>& _xy, const T& _z) : values{ _xy.x, _xy.y, _z } {}
@@ -115,7 +115,7 @@ union vector<T, 3>
 template<typename T>
 union vector<T, 4>
 {
-	vector() : vector(static_cast<T>(0)) {}
+	vector() : vector(T()) {}
 	vector(const T& t) : values{ t, t, t, t } {}
 	vector(const T& _x, const T& _y, const T& _z, const T& _w) : values{ _x, _y, _z, _w } {}
 	vector(const vector<T,2>& _xy, const T& _z, const T& _w) : values{ _xy.x, _xy.y, _z, _w } {}
