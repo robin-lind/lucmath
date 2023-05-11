@@ -160,7 +160,7 @@ union vector<T, 4>
 
 #define vector_vector_arithmetic_op(op) \
 template<typename T, size_t N> \
-auto operator op (const vector<T, N>& lhs, const vector<T, N>& rhs) \
+constexpr auto operator op (const vector<T, N>& lhs, const vector<T, N>& rhs) \
 { \
     const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
     { \
@@ -171,7 +171,7 @@ auto operator op (const vector<T, N>& lhs, const vector<T, N>& rhs) \
 }
 #define vector_scalar_arithmetic_op(op) \
 template<typename T, size_t N> \
-auto operator op (const vector<T, N>& lhs, const T& rhs) \
+constexpr auto operator op (const vector<T, N>& lhs, const T& rhs) \
 { \
     const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
     { \
@@ -182,7 +182,7 @@ auto operator op (const vector<T, N>& lhs, const T& rhs) \
 }
 #define scalar_vector_arithmetic_op(op) \
 template<typename T, size_t N> \
-auto operator op (const T& lhs, const vector<T, N>& rhs) \
+constexpr auto operator op (const T& lhs, const vector<T, N>& rhs) \
 { \
     const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
     { \
@@ -201,24 +201,24 @@ scalar_vector_arithmetic_op(op)
 macro(+) \
 macro(-) \
 macro(*) \
-macro(/) \
-macro(<) \
-macro(<=) \
-macro(>) \
-macro(>=) \
-macro(==) \
-macro(!=)
+macro(/)
+// macro(<) \
+// macro(<=) \
+// macro(>) \
+// macro(>=) \
+// macro(==) \
+// macro(!=)
 
 #define vector_vector_assignment_op(op,opequals) \
 template<typename T, size_t N> \
-auto operator opequals (vector<T, N>& lhs, const vector<T, N>& rhs) \
+constexpr auto operator opequals (vector<T, N>& lhs, const vector<T, N>& rhs) \
 { \
 	lhs = lhs op rhs; \
 }
 
 #define vector_t_assignment_op(op,opequals) \
 template<typename T, size_t N> \
-auto operator opequals (vector<T, N>& lhs, const T& rhs) \
+constexpr auto operator opequals (vector<T, N>& lhs, const T& rhs) \
 { \
 	lhs = lhs op rhs; \
 }
@@ -237,7 +237,7 @@ every_arithmetic_op(vector_arithmetic_op)
 every_assignment_op(vector_assignment_op)
 
 template<typename T, size_t N>
-auto operator-(const vector<T, N>& t)
+constexpr auto operator-(const vector<T, N>& t)
 {
 	const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
     {
@@ -284,7 +284,7 @@ using bool3 = vector<bool,3>;
 using bool4 = vector<bool,4>;
 
 template<typename Op = std::plus<void>, typename T, size_t N>
-auto collapse(const vector<T, N>& a)
+constexpr auto collapse(const vector<T, N>& a)
 {
     if constexpr (N == 2)
         return Op{}(a.x, a.y);
@@ -302,14 +302,14 @@ auto collapse(const vector<T, N>& a)
 }
 
 template<typename T, size_t N>
-auto dot(const vector<T, N>& a, const vector<T, N>& b)
+constexpr auto dot(const vector<T, N>& a, const vector<T, N>& b)
 {
     const auto result = collapse(a * b);
     return result;
 }
 
 template<typename T>
-auto cross(const vector<T, 3>& a, const vector<T, 3>& b)
+constexpr auto cross(const vector<T, 3>& a, const vector<T, 3>& b)
 {
     const vector<T, 3> result{
         (a.y * b.z) - (a.z * b.y),
@@ -320,67 +320,45 @@ auto cross(const vector<T, 3>& a, const vector<T, 3>& b)
 }
 
 template<typename T, size_t N>
-auto length_squared(const vector<T, N>& a)
+constexpr auto length_squared(const vector<T, N>& a)
 {
     const auto result = dot(a, a);
     return result;
 }
 
 template<typename T, size_t N>
-auto length(const vector<T, N>& a)
+constexpr auto length(const vector<T, N>& a)
 {
     const auto result = std::sqrt(length_squared(a));
     return result;
 }
 
 template<typename T, size_t N>
-auto distance_squared(const vector<T, N>& a, const vector<T, N>& b)
+constexpr auto distance_squared(const vector<T, N>& a, const vector<T, N>& b)
 {
     const auto result = length_squared(a - b);
     return result;
 }
 
 template<typename T, size_t N>
-auto distance(const vector<T, N>& a, const vector<T, N>& b)
+constexpr auto distance(const vector<T, N>& a, const vector<T, N>& b)
 {
     const auto result = length(a - b);
     return result;
 }
 
 template<typename T, size_t N>
-auto normalize(const vector<T, N>& t)
+constexpr auto normalize(const vector<T, N>& t)
 {
     const auto result = t / length(t);
     return result;
 }
 
 template<typename T, size_t N>
-auto normalized_with_length(const vector<T, N>& a)
+constexpr auto normalized_with_length(const vector<T, N>& a)
 {
     const auto l = length(a);
     return std::make_tuple(a / l, l);
-}
-
-template<typename T, size_t N>
-auto min(const vector<T, N>& t, const vector<T, N>& u)
-{
-	const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
-    {
-        return std::array<T, N>{std::min(std::get<I>(t.values), std::get<I>(u.values))...};
-    }
-    (std::make_index_sequence<N>{});
-    return vector<T, N>(result);
-}
-
-template<typename T, size_t N>
-auto max(const vector<T, N>& t, const vector<T, N>& u)
-{
-	const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
-    {
-        return std::array<T, N>{std::max(std::get<I>(t.values), std::get<I>(u.values))...};
-    }
-    (std::make_index_sequence<N>{});
-    return vector<T, N>(result);
 }
 
 }; // namespace math

@@ -28,6 +28,49 @@
 #include <utility>
 
 namespace math {
+template<typename T, size_t N>
+constexpr auto min(const vector<T, N>& t, const vector<T, N>& u)
+{
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
+    {
+        return std::array<T, N>{ std::min(std::get<I>(t.values), std::get<I>(u.values))... };
+    }
+    (std::make_index_sequence<N>{});
+    return vector<T, N>(result);
+}
+
+template<typename T, size_t N>
+constexpr auto max(const vector<T, N>& t, const vector<T, N>& u)
+{
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
+    {
+        return std::array<T, N>{ std::max(std::get<I>(t.values), std::get<I>(u.values))... };
+    }
+    (std::make_index_sequence<N>{});
+    return vector<T, N>(result);
+}
+
+template<typename T, size_t N>
+constexpr auto min(const vector<T, N>& t, const T& u)
+{
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
+    {
+        return std::array<T, N>{ std::min(std::get<I>(t.values), u)... };
+    }
+    (std::make_index_sequence<N>{});
+    return vector<T, N>(result);
+}
+
+template<typename T, size_t N>
+constexpr auto max(const vector<T, N>& t, const T& u)
+{
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
+    {
+        return std::array<T, N>{ std::max(std::get<I>(t.values), u)... };
+    }
+    (std::make_index_sequence<N>{});
+    return vector<T, N>(result);
+}
 
 template<typename T, typename U>
 constexpr auto map(const T x, const U in_min, const U in_max, const U out_min, const U out_max)
@@ -79,9 +122,42 @@ constexpr auto sanitize(const vector<T, N>& v)
 }
 
 template<typename T>
-auto reflect(const vector<T, 3>& w, const vector<T, 3>& n)
+constexpr auto saturate(const T x)
 {
-    const auto result = n * (math::dot(n, w) * static_cast<T>(2)) - w;
+    return math::clamp(x, T(0), T(1));
+}
+
+template<typename T, size_t N>
+constexpr auto saturate(const vector<T, N>& v)
+{
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
+    {
+        return std::array<T, N>{ saturate(std::get<I>(v.values))... };
+    }
+    (std::make_index_sequence<N>{});
+    return vector<T, N>(result);
+}
+
+
+template<typename T>
+constexpr auto reflect(const vector<T, 3>& w, const vector<T, 3>& n)
+{
+    const auto result = n * (dot(n, w) * static_cast<T>(2)) - w;
+    return result;
+}
+
+template<typename T, size_t N>
+constexpr auto mean(const vector<T, N>& v)
+{
+    const auto m = T(1) / T(N);
+    const auto result = collapse(v) * m;
+    return result;
+}
+
+template<typename T, size_t N>
+constexpr auto face_forward(const vector<T, N>& n, const vector<T, N>& v)
+{
+    const auto result = dot(n, v) < T(0) ? -n : n;
     return result;
 }
 
@@ -125,6 +201,96 @@ struct ortho_normal_base {
         return dir.x * tangent + dir.y * bi_tangent + dir.z * normal;
     }
 };
+
+namespace onb {
+template<typename T>
+auto cos_theta(const vector<T, 3>& w)
+{
+    const auto result = w.z;
+    return result;
+}
+
+template<typename T>
+auto abs_cos_theta(const vector<T, 3>& w)
+{
+    const auto result = std::abs(cos_theta(w));
+    return result;
+}
+
+template<typename T>
+auto cos_theta_sq(const vector<T, 3>& w)
+{
+    const auto result = w.z * w.z;
+    return result;
+}
+
+template<typename T>
+auto sin_theta_sq(const vector<T, 3>& w)
+{
+    const auto result = std::max(T(0), T(1) - cos_theta_sq(w));
+    return result;
+}
+
+template<typename T>
+auto sin_theta(const vector<T, 3>& w)
+{
+    const auto result = std::sqrt(sin_theta_sq(w));
+    return result;
+}
+
+template<typename T>
+auto tan_theta(const vector<T, 3>& w)
+{
+    const auto result = sin_theta(w) / cos_theta(w);
+    return result;
+}
+
+template<typename T>
+auto tan_theta_sq(const vector<T, 3>& w)
+{
+    const auto result = sin_theta_sq(w) / cos_theta_sq(w);
+    return result;
+}
+
+template<typename T>
+auto cos_phi(const vector<T, 3>& w)
+{
+    const auto st = sin_theta(w);
+    const auto result = st == T(0) ? T(0) : clamp(w.x / st, T(-1), T(1));
+    return result;
+}
+
+template<typename T>
+auto sin_phi(const vector<T, 3>& w)
+{
+    const auto st = sin_theta(w);
+    const auto result = st == T(0) ? T(0) : clamp(w.y / st, T(-1), T(1));
+    return result;
+}
+
+template<typename T>
+auto cos_phi_sq(const vector<T, 3>& w)
+{
+    const auto cp = cos_phi(w);
+    const auto result = cp * cp;
+    return result;
+}
+
+template<typename T>
+auto sin_phi_sq(const vector<T, 3>& w)
+{
+    const auto sp = sin_phi(w);
+    const auto result = sp * sp;
+    return result;
+}
+
+template<typename T>
+auto same_hemisphere(const vector<T, 3>& wo, const vector<T, 3>& wi)
+{
+    const auto result = wo.z * wi.z > T(0);
+    return result;
+}
+} // namespace onb
 
 } // namespace math
 
