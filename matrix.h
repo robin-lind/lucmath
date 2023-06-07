@@ -271,14 +271,6 @@ constexpr matrix<T, N, N> inverse(const matrix<T, N, N>& a)
     return result;
 }
 
-template<typename T>
-std::pair<vector<T, 3>, vector<T, 3>> transform_ray(const matrix<T, 4, 4>& transform, const vector<T, 3> org, const vector<T, 3>& dir)
-{
-    const auto _org = mul(transform, vector<T, 4>(org, 1));
-    const auto _dir = mul(transform, vector<T, 4>(dir, 0));
-    return std::make_pair(_org.xyz, _dir.xyz);
-}
-
 using matrix3 = matrix<float, 3, 3>;
 using matrix4 = matrix<float, 4, 4>;
 
