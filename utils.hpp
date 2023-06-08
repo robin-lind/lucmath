@@ -23,7 +23,7 @@
 #ifndef UTILS_MATH_H
 #define UTILS_MATH_H
 
-#include "vector.h"
+#include "vector.hpp"
 #include <cmath>
 #include <utility>
 

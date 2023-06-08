@@ -26,7 +26,7 @@
 #ifndef MATRIX_MATH_H
 #define MATRIX_MATH_H
 
-#include "vector.h"
+#include "vector.hpp"
 #include <array>
 #include <algorithm>
 #include <cstddef>

@@ -23,8 +23,8 @@
 #ifndef BOUNDS_MATH_H
 #define BOUNDS_MATH_H
 
-#include "vector.h"
-#include "utils.h"
+#include "vector.hpp"
+#include "utils.hpp"
 #include <array>
 #include <numeric>
 
