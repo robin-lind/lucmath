@@ -121,19 +121,29 @@ union matrix<T, 4, 4> {
     };
 };
 
-template<typename T>
-auto quat_to_matrix(vector<T, 4> q)
+template<typename T, size_t R, size_t C, size_t N>
+constexpr auto diagonal_matrix(const vector<T, N>& v)
 {
-    matrix<T, 4, 4> m;
-    m.x = { q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z, (q.x * q.y + q.z * q.w) * 2, (q.z * q.x - q.y * q.w) * 2, 0 };
-    m.y = { (q.x * q.y - q.z * q.w) * 2, q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z, (q.y * q.z + q.x * q.w) * 2, 0 };
-    m.z = { (q.z * q.x + q.y * q.w) * 2, (q.y * q.z - q.x * q.w) * 2, q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z, 0 };
-    m.w = { 0, 0, 0, 1 };
+    constexpr size_t RC = std::min(R, C), RCN = std::min(RC, N);
+    matrix<T, R, C> result;
+    for (size_t i = 0; i < RCN; i++)
+        result.values[i * C + i] = v.values[i];
+    return result;
+}
+
+template<typename T>
+constexpr auto quat_to_matrix(vector<T, 4> q)
+{
+    const matrix<T, 4, 4> m(
+      { q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z, (q.x * q.y + q.z * q.w) * T(2), (q.z * q.x - q.y * q.w) * T(2), T(0) },
+      { (q.x * q.y - q.z * q.w) * T(2), q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z, (q.y * q.z + q.x * q.w) * T(2), T(0) },
+      { (q.z * q.x + q.y * q.w) * T(2), (q.y * q.z - q.x * q.w) * T(2), q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z, T(0) },
+      { T(0), T(0), T(0), T(1) });
     return m;
 }
 
 template<typename T, size_t R, size_t C>
-vector<T, R> mul(const matrix<T, R, C>& m, const vector<T, R>& v)
+constexpr vector<T, R> mul(const matrix<T, R, C>& m, const vector<T, R>& v)
 {
     const auto e = [&]<std::size_t... I>(std::index_sequence<I...>)
     {
@@ -147,7 +157,7 @@ vector<T, R> mul(const matrix<T, R, C>& m, const vector<T, R>& v)
 }
 
 template<typename T, size_t R, size_t C>
-matrix<T, R, C> mul(const matrix<T, R, C>& a, const matrix<T, R, C>& b)
+constexpr matrix<T, R, C> mul(const matrix<T, R, C>& a, const matrix<T, R, C>& b)
 {
     const auto e = [&]<std::size_t... I>(std::index_sequence<I...>)
     {
@@ -158,7 +168,7 @@ matrix<T, R, C> mul(const matrix<T, R, C>& a, const matrix<T, R, C>& b)
 }
 
 template<typename T, size_t R, size_t C, size_t N>
-auto scale(const vector<T, N>& v)
+constexpr auto scale(const vector<T, N>& v)
 {
     constexpr auto countRC = std::min(R, C);
     constexpr auto countN = std::min(countRC, N);
@@ -171,7 +181,7 @@ auto scale(const vector<T, N>& v)
 }
 
 template<typename T>
-auto translation(const vector<T, 3>& v)
+constexpr auto translation(const vector<T, 3>& v)
 {
     matrix<T, 4, 4> result;
     result.w.xyz = v;
@@ -179,7 +189,7 @@ auto translation(const vector<T, 3>& v)
 }
 
 template<typename T, size_t R, size_t C>
-auto transpose(const matrix<T, R, C>& m)
+constexpr auto transpose(const matrix<T, R, C>& m)
 {
     matrix<T, C, R> result;
     for (size_t c = 0; c < C; c++)
