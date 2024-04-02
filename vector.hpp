@@ -35,18 +35,18 @@ namespace math
 template<typename T, size_t N>
 union vector
 {
-    vector() : vector(T()) {}
-    vector(const T& t) { std::fill(std::begin(values), std::end(values), t); }
-    vector(const std::array<T, N>& a) : values(a) {}
+    constexpr vector() : vector(T()) {}
+    constexpr vector(const T& t) { std::fill(std::begin(values), std::end(values), t); }
+    constexpr vector(const std::array<T, N>& a) : values(a) {}
     std::array<T, N> values{};
 };
 
 template<typename T>
 union vector<T, 1>
 {
-	vector() : vector(T()) {}
-	vector(const T& t) : values{ t } {}
-    vector(const std::array<T, 1>& a) : values(a) {}
+	constexpr vector() : vector(T()) {}
+	constexpr vector(const T& t) : values{ t } {}
+    constexpr vector(const std::array<T, 1>& a) : values(a) {}
 	T t;
 	std::array<T, 1> values{};
     operator T&() { return t; }
@@ -56,10 +56,10 @@ union vector<T, 1>
 template<typename T>
 union vector<T, 2>
 {
-	vector() : vector(T()) {}
-	vector(const T& t) : values{ t, t } {}
-	vector(const T& _x, const T& _y) : values{ _x, _y } {}
-    vector(const std::array<T, 2>& a) : values(a) {}
+	constexpr vector() : vector(T()) {}
+	constexpr vector(const T& t) : values{ t, t } {}
+	constexpr vector(const T& _x, const T& _y) : values{ _x, _y } {}
+    constexpr vector(const std::array<T, 2>& a) : values(a) {}
 	struct
 	{
 		T x;
@@ -81,12 +81,12 @@ union vector<T, 2>
 template<typename T>
 union vector<T, 3>
 {
-	vector() : vector(T()) {}
-	vector(const T& t) : values{ t, t, t } {}
-	vector(const T& _x, const T& _y, const T& _z) : values{ _x, _y, _z } {}
-	vector(const vector<T,2>& _xy, const T& _z) : values{ _xy.x, _xy.y, _z } {}
-	vector(const T& _x, const vector<T,2>& _yz) : values{ _x, _yz.x, _yz.y } {}
-    vector(const std::array<T, 3>& a) : values(a) {}
+	constexpr vector() : vector(T()) {}
+	constexpr vector(const T& t) : values{ t, t, t } {}
+	constexpr vector(const T& _x, const T& _y, const T& _z) : values{ _x, _y, _z } {}
+	constexpr vector(const vector<T,2>& _xy, const T& _z) : values{ _xy.x, _xy.y, _z } {}
+	constexpr vector(const T& _x, const vector<T,2>& _yz) : values{ _x, _yz.x, _yz.y } {}
+    constexpr vector(const std::array<T, 3>& a) : values(a) {}
 	struct
 	{
 		T x;
@@ -115,16 +115,16 @@ union vector<T, 3>
 template<typename T>
 union vector<T, 4>
 {
-	vector() : vector(T()) {}
-	vector(const T& t) : values{ t, t, t, t } {}
-	vector(const T& _x, const T& _y, const T& _z, const T& _w) : values{ _x, _y, _z, _w } {}
-	vector(const vector<T,2>& _xy, const T& _z, const T& _w) : values{ _xy.x, _xy.y, _z, _w } {}
-	vector(const vector<T,3>& _xyz, const T& _w) : values{ _xyz.x, _xyz.y, _xyz.z, _w } {}
-	vector(const vector<T,2>& _xy, const vector<T,2>& _zw) : values{ _xy.x, _xy.y, _zw.x, _zw.y } {}
-	vector(const T& _x, const vector<T,3>& _yzw) : values{ _x, _yzw.x, _yzw.y, _yzw.z } {}
-	vector(const T& _x, const vector<T,2>& _yz, const T& _w) : values{ _x, _yz.x, _yz.y, _w } {}
-	vector(const T& _x, const T& _y, const vector<T,2>& _zw) : values{ _x, _y, _zw.x, _zw.y } {}
-    vector(const std::array<T, 4>& a) : values(a) {}
+	constexpr vector() : vector(T()) {}
+	constexpr vector(const T& t) : values{ t, t, t, t } {}
+	constexpr vector(const T& _x, const T& _y, const T& _z, const T& _w) : values{ _x, _y, _z, _w } {}
+	constexpr vector(const vector<T,2>& _xy, const T& _z, const T& _w) : values{ _xy.x, _xy.y, _z, _w } {}
+	constexpr vector(const vector<T,3>& _xyz, const T& _w) : values{ _xyz.x, _xyz.y, _xyz.z, _w } {}
+	constexpr vector(const vector<T,2>& _xy, const vector<T,2>& _zw) : values{ _xy.x, _xy.y, _zw.x, _zw.y } {}
+	constexpr vector(const T& _x, const vector<T,3>& _yzw) : values{ _x, _yzw.x, _yzw.y, _yzw.z } {}
+	constexpr vector(const T& _x, const vector<T,2>& _yz, const T& _w) : values{ _x, _yz.x, _yz.y, _w } {}
+	constexpr vector(const T& _x, const T& _y, const vector<T,2>& _zw) : values{ _x, _y, _zw.x, _zw.y } {}
+    constexpr vector(const std::array<T, 4>& a) : values(a) {}
 	struct
 	{
 		T x;
