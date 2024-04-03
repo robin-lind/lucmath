@@ -145,11 +145,9 @@ constexpr auto quat_to_matrix(vector<T, 4> q)
 template<typename T, size_t R, size_t C>
 constexpr vector<T, R> mul(const matrix<T, R, C>& m, const vector<T, R>& v)
 {
-    const auto e = [&]<std::size_t... I>(std::index_sequence<I...>)
-    {
+    const auto e = [&]<std::size_t... I>(std::index_sequence<I...>) {
         return std::array<vector<T, R>, C>{ std::get<I>(m.columns) * std::get<I>(v.values)... };
-    }
-    (std::make_index_sequence<C>{});
+    }(std::make_index_sequence<C>{});
     auto result = e[0];
     for (size_t i = 1; i < C; i++)
         result += e[i];
@@ -159,11 +157,9 @@ constexpr vector<T, R> mul(const matrix<T, R, C>& m, const vector<T, R>& v)
 template<typename T, size_t R, size_t C>
 constexpr matrix<T, R, C> mul(const matrix<T, R, C>& a, const matrix<T, R, C>& b)
 {
-    const auto e = [&]<std::size_t... I>(std::index_sequence<I...>)
-    {
+    const auto e = [&]<std::size_t... I>(std::index_sequence<I...>) {
         return std::array<vector<T, R>, C>{ mul(a, std::get<I>(b.columns))... };
-    }
-    (std::make_index_sequence<C>{});
+    }(std::make_index_sequence<C>{});
     return { e };
 }
 

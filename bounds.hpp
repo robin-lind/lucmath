@@ -28,12 +28,10 @@
 #include <array>
 #include <numeric>
 
-namespace math
-{
+namespace math {
 
 template<typename T, size_t N>
-struct bounds
-{
+struct bounds {
     bounds() :
       min(std::numeric_limits<T>::max()), max(-std::numeric_limits<T>::max()) {}
 
@@ -74,6 +72,6 @@ using bounds2 = bounds<float, 2>;
 using bounds3 = bounds<float, 3>;
 using bounds4 = bounds<float, 4>;
 
-}
+} // namespace math
 
 #endif /* BOUNDS_MATH_H */

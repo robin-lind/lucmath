@@ -31,61 +31,53 @@ namespace math {
 template<typename T, size_t N>
 constexpr auto min(const vector<T, N>& t, const vector<T, N>& u)
 {
-    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
-    {
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
         return std::array<T, N>{ std::min(std::get<I>(t.values), std::get<I>(u.values))... };
-    }
-    (std::make_index_sequence<N>{});
+    }(std::make_index_sequence<N>{});
     return vector<T, N>(result);
 }
 
 template<typename T, size_t N>
 constexpr auto max(const vector<T, N>& t, const vector<T, N>& u)
 {
-    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
-    {
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
         return std::array<T, N>{ std::max(std::get<I>(t.values), std::get<I>(u.values))... };
-    }
-    (std::make_index_sequence<N>{});
+    }(std::make_index_sequence<N>{});
     return vector<T, N>(result);
 }
 
 template<typename T, size_t N>
 constexpr auto min(const vector<T, N>& t, const T& u)
 {
-    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
-    {
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
         return std::array<T, N>{ std::min(std::get<I>(t.values), u)... };
-    }
-    (std::make_index_sequence<N>{});
+    }(std::make_index_sequence<N>{});
     return vector<T, N>(result);
 }
 
 template<typename T, size_t N>
 constexpr auto max(const vector<T, N>& t, const T& u)
 {
-    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
-    {
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
         return std::array<T, N>{ std::max(std::get<I>(t.values), u)... };
-    }
-    (std::make_index_sequence<N>{});
+    }(std::make_index_sequence<N>{});
     return vector<T, N>(result);
 }
 
-template<typename T, typename U>
-constexpr auto map(const T x, const U in_min, const U in_max, const U out_min, const U out_max)
+template<typename T, typename U, typename V>
+constexpr auto map(const T& x, const U& in_min, const U& in_max, const V& out_min, const V& out_max)
 {
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    return (x - T(in_min)) * T(out_max - out_min) / T(in_max - in_min) + T(out_min);
 }
 
 template<typename T, typename U>
-constexpr auto lerp(const T x, const U a, const U b)
+constexpr auto lerp(const T& x, const U& a, const U& b)
 {
-    return (T(1) - x) * a + x * b;
+    return (T(1) - x) * T(a) + x * T(b);
 }
 
 template<typename T>
-constexpr auto clamp(const T x, const T min, const T max)
+constexpr auto clamp(const T& x, const T& min, const T& max)
 {
     if (x < min) return min;
     if (x > max) return max;
@@ -93,7 +85,7 @@ constexpr auto clamp(const T x, const T min, const T max)
 }
 
 template<typename T>
-auto wrap(const T x, const T inclusive_min, const T exclusive_max)
+auto wrap(const T& x, const T& inclusive_min, const T& exclusive_max)
 {
     const auto range = exclusive_max - inclusive_min;
     auto result = x;
@@ -103,7 +95,7 @@ auto wrap(const T x, const T inclusive_min, const T exclusive_max)
 }
 
 template<typename T>
-constexpr auto sanitize(const T x)
+constexpr auto sanitize(const T& x)
 {
     if (std::isfinite(x))
         return x;
@@ -113,31 +105,26 @@ constexpr auto sanitize(const T x)
 template<typename T, size_t N>
 constexpr auto sanitize(const vector<T, N>& v)
 {
-    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
-    {
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
         return std::array<T, N>{ sanitize(std::get<I>(v.values))... };
-    }
-    (std::make_index_sequence<N>{});
+    }(std::make_index_sequence<N>{});
     return vector<T, N>(result);
 }
 
 template<typename T>
-constexpr auto saturate(const T x)
+constexpr auto saturate(const T& x)
 {
-    return math::clamp(x, T(0), T(1));
+    return clamp(x, T(0), T(1));
 }
 
 template<typename T, size_t N>
 constexpr auto saturate(const vector<T, N>& v)
 {
-    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>)
-    {
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
         return std::array<T, N>{ saturate(std::get<I>(v.values))... };
-    }
-    (std::make_index_sequence<N>{});
+    }(std::make_index_sequence<N>{});
     return vector<T, N>(result);
 }
-
 
 template<typename T>
 constexpr auto reflect(const vector<T, 3>& w, const vector<T, 3>& n)
@@ -162,14 +149,14 @@ constexpr auto face_forward(const vector<T, N>& n, const vector<T, N>& v)
 }
 
 template<size_t N>
-bool all_true(vector<bool, N> t)
+bool all_true(const vector<bool, N>& t)
 {
     const bool result = std::apply([](auto&&...v) { return (v && ...); }, t.values);
     return result;
 }
 
 template<size_t N>
-bool any_true(vector<bool, N> t)
+bool any_true(const vector<bool, N>& t)
 {
     const bool result = std::apply([](auto&&...v) { return (v || ...); }, t.values);
     return result;
@@ -191,12 +178,12 @@ struct ortho_normal_base {
         bi_tangent = vector<T, 3>(b, sign_z + normal.y * normal.y * a, -normal.y);
     }
 
-    vector<T, 3> to_local(const vector<T, 3>& dir) const
+    vector<T, 3> local(const vector<T, 3>& dir) const
     {
         return { dot(dir, tangent), dot(dir, bi_tangent), dot(dir, normal) };
     }
 
-    vector<T, 3> to_world(const vector<T, 3>& dir) const
+    vector<T, 3> world(const vector<T, 3>& dir) const
     {
         return dir.x * tangent + dir.y * bi_tangent + dir.z * normal;
     }
@@ -291,6 +278,45 @@ auto same_hemisphere(const vector<T, 3>& wo, const vector<T, 3>& wi)
     return result;
 }
 } // namespace onb
+
+template<typename T>
+struct plane {
+    vector<T, 3> normal;
+    T d;
+
+    plane() = default;
+
+    plane(const vector<T, 3>& p, const vector<T, 3>& n) :
+      normal(n)
+    {
+        d = -dot(p, n);
+    }
+
+    auto distance(const vector<T, 3>& p) const
+    {
+        return (dot(p, normal) + d);
+    }
+
+    auto above(const vector<T, 3>& p) const
+    {
+        return distance(p) > 0.f;
+    }
+
+    std::optional<vector<T, 3>> intersect(const vector<T, 3>& P0, const vector<T, 3>& P1) const
+    {
+        const auto P0P1 = P1 - P0;
+        const auto denominator = dot(normal, P0P1);
+        if (std::abs(denominator) < std::numeric_limits<T>::epsilon())
+            return {};
+        const auto u = distance(P0) / -denominator;
+        if (u < 0.f || u > 1.f)
+            return {};
+        return P0 + P0P1 * u;
+    }
+};
+
+using planef = vector<float>;
+using planed = vector<double>;
 
 } // namespace math
 
