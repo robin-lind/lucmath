@@ -20,58 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BOUNDS_MATH_H
-#define BOUNDS_MATH_H
+#ifndef TRIANGLE_MATH_H
+#define TRIANGLE_MATH_H
 
 #include "vector.hpp"
-#include "utils.hpp"
-#include <array>
-#include <numeric>
 
 namespace math {
 
-template<typename T, size_t N>
-struct bounds {
-    bounds() :
-      min(std::numeric_limits<T>::max()), max(-std::numeric_limits<T>::max()) {}
+template<typename T>
+auto triangle_center(const vector<T, 3>& a, const vector<T, 3>& b, const vector<T, 3>& c)
+{
+    return (a + b + c) * (1.f / 3.f);
+}
 
-    template<typename... Ts>
-    bounds(const vector<T, N>& t, const Ts&...args) :
-      min(t), max(t)
-    {
-        constexpr auto Size = sizeof...(args);
-        const std::array<vector<T, N>, Size> items{ vector<T, N>(args)... };
-        for (const auto& v : items)
-            extend(v);
-    }
+template<typename T>
+auto triangle_normal(const vector<T, 3>& a, const vector<T, 3>& b, const vector<T, 3>& c)
+{
+    return normalize(cross(b - a, c - a));
+}
 
-    bounds<T, N>& extend(const bounds<T, N>& t)
-    {
-        min = math::min(min, t.min);
-        max = math::max(max, t.max);
-        return *this;
-    }
+template<typename T>
+auto triangle_area(const vector<T, 3>& a, const vector<T, 3>& b, const vector<T, 3>& c)
+{
+    return length(cross(b - a, c - a)) * .5f;
+}
 
-    bounds<T, N>& extend(const vector<T, N>& t)
-    {
-        min = math::min(min, t);
-        max = math::max(max, t);
-        return *this;
-    }
-
-    vector<T, N> volume() const
-    {
-        auto result = max - min;
-        return result;
-    }
-
-    vector<T, N> min, max;
-};
-
-using bounds2 = bounds<float, 2>;
-using bounds3 = bounds<float, 3>;
-using bounds4 = bounds<float, 4>;
+template<typename T>
+auto triangle_signed_volume(const vector<T, 3>& a, const vector<T, 3>& b, const vector<T, 3>& c)
+{
+    return dot(a, cross(b, c)) * (1.f / 6.f);
+}
 
 } // namespace math
 
-#endif /* BOUNDS_MATH_H */
+#endif /* TRIANGLE_MATH_H */

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Robin Lind
+// Copyright (c) 2024 Robin Lind
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 #include "vector.hpp"
 #include <cmath>
 #include <utility>
+#include <optional>
 
 namespace math {
 template<typename T, size_t N>
@@ -315,8 +316,8 @@ struct plane {
     }
 };
 
-using planef = vector<float>;
-using planed = vector<double>;
+using planef = plane<float>;
+using planed = plane<double>;
 
 } // namespace math
 

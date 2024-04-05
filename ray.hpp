@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BOUNDS_MATH_H
-#define BOUNDS_MATH_H
+#ifndef RAY_MATH_H
+#define RAY_MATH_H
 
 #include "vector.hpp"
 #include "utils.hpp"
@@ -29,49 +29,25 @@
 #include <numeric>
 
 namespace math {
-
 template<typename T, size_t N>
-struct bounds {
-    bounds() :
-      min(std::numeric_limits<T>::max()), max(-std::numeric_limits<T>::max()) {}
+struct ray {
+    vector<T, N> p;
+    vector<T, N> d;
 
-    template<typename... Ts>
-    bounds(const vector<T, N>& t, const Ts&...args) :
-      min(t), max(t)
+    auto along(const T& t) const
     {
-        constexpr auto Size = sizeof...(args);
-        const std::array<vector<T, N>, Size> items{ vector<T, N>(args)... };
-        for (const auto& v : items)
-            extend(v);
+        return p + d * t;
     }
-
-    bounds<T, N>& extend(const bounds<T, N>& t)
-    {
-        min = math::min(min, t.min);
-        max = math::max(max, t.max);
-        return *this;
-    }
-
-    bounds<T, N>& extend(const vector<T, N>& t)
-    {
-        min = math::min(min, t);
-        max = math::max(max, t);
-        return *this;
-    }
-
-    vector<T, N> volume() const
-    {
-        auto result = max - min;
-        return result;
-    }
-
-    vector<T, N> min, max;
 };
 
-using bounds2 = bounds<float, 2>;
-using bounds3 = bounds<float, 3>;
-using bounds4 = bounds<float, 4>;
+using rayf3 = ray<float, 3>;
+using rayd3 = ray<double, 3>;
 
+namespace r2 {
+using rayf2 = ray<float, 2>;
+using rayd2 = ray<double, 2>;
+using rayi2 = ray<int32_t, 2>;
+} // namespace r2
 } // namespace math
 
-#endif /* BOUNDS_MATH_H */
+#endif /* RAY_MATH_H */
