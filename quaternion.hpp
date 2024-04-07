@@ -179,6 +179,31 @@ constexpr auto transform(const quaternion<T>& q, const matrix<T, 4, 4>& mat)
 }
 
 template<typename T>
+constexpr auto to_matrix(const quaternion<T>& q)
+{
+    const auto a2 = q.x * q.x;
+    const auto b2 = q.y * q.y;
+    const auto c2 = q.z * q.z;
+    const auto ac = q.x * q.z;
+    const auto ab = q.x * q.y;
+    const auto bc = q.y * q.z;
+    const auto ad = q.w * q.x;
+    const auto bd = q.w * q.y;
+    const auto cd = q.w * q.z;
+    matrix<T, 4, 4> result;
+    result.values[0] = T(1) - T(2) * (b2 + c2);
+    result.values[1] = T(2) * (ab + cd);
+    result.values[2] = T(2) * (ac - bd);
+    result.values[4] = T(2) * (ab - cd);
+    result.values[5] = T(1) - T(2) * (a2 + c2);
+    result.values[6] = T(2) * (bc + ad);
+    result.values[8] = T(2) * (ac + bd);
+    result.values[9] = T(2) * (bc - ad);
+    result.values[10] = T(1) - T(2) * (a2 + b2);
+    return result;
+}
+
+template<typename T>
 constexpr auto inverse(const quaternion<T>& q)
 {
     const auto ls = length_squared(q);

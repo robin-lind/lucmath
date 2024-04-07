@@ -40,6 +40,12 @@ struct ray {
     }
 };
 
+template<typename T, size_t N>
+auto along_ray(const vector<T, N>& p, const vector<T, N>& d, const T& t)
+{
+    return p + d * t;
+}
+
 using rayf3 = ray<float, 3>;
 using rayd3 = ray<double, 3>;
 
