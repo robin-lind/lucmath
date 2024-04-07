@@ -45,23 +45,29 @@ struct bounds {
             extend(v);
     }
 
-    bounds<T, N>& extend(const bounds<T, N>& t)
+    auto& extend(const bounds<T, N>& t)
     {
-        min = math::min(min, t.min);
-        max = math::max(max, t.max);
+        extend(t.min);
+        extend(t.max);
         return *this;
     }
 
-    bounds<T, N>& extend(const vector<T, N>& t)
+    auto& extend(const vector<T, N>& t)
     {
         min = math::min(min, t);
         max = math::max(max, t);
         return *this;
     }
 
-    vector<T, N> volume() const
+    auto volume() const
     {
         auto result = max - min;
+        return result;
+    }
+
+    auto center() const
+    {
+        auto result = (max + min) * T(.5);
         return result;
     }
 

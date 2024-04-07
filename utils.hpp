@@ -24,6 +24,7 @@
 #define UTILS_MATH_H
 
 #include "vector.hpp"
+#include "quaternion.hpp"
 #include <cmath>
 #include <utility>
 #include <optional>
@@ -74,7 +75,7 @@ constexpr auto map(const T& x, const U& in_min, const U& in_max, const V& out_mi
 template<typename T, typename U>
 constexpr auto lerp(const T& x, const U& a, const U& b)
 {
-    return (T(1) - x) * T(a) + x * T(b);
+    return (T(1) - x) * a + x * b;
 }
 
 template<typename T>
@@ -86,12 +87,13 @@ constexpr auto clamp(const T& x, const T& min, const T& max)
 }
 
 template<typename T>
-auto wrap(const T& x, const T& inclusive_min, const T& exclusive_max)
+auto wrap(const T& x, const T& min, const T& max)
 {
-    const auto range = exclusive_max - inclusive_min;
+    const auto range = max - min;
+    // const auto result = x - range * std::floor((x - min) / range);
     auto result = x;
-    while (result < inclusive_min) result += range;
-    while (result >= exclusive_max) result -= range;
+    while (result < min) result += range;
+    while (result >= max) result -= range;
     return result;
 }
 
@@ -149,6 +151,77 @@ constexpr auto face_forward(const vector<T, N>& n, const vector<T, N>& v)
     return result;
 }
 
+template<typename T, size_t N>
+constexpr auto rotate_axis_angle(const vector<T, N>& v, const vector<T, N>& axis, const T& angle)
+{
+    const auto axis_len = length(axis);
+    const auto axis_len1 = axis_len == T(0) ? T(1) : axis_len;
+    const auto scaled_axis = axis / axis_len1;
+
+    const T a = std::sin(angle * T(.5));
+    const float3 w = scaled_axis * a;
+    const auto wv = cross(w, v);
+    const auto v1 = cross(w, wv) * T(2);
+    const auto b = std::cos(angle * T(.5)) * T(2);
+    const auto v2 = wv * b;
+
+    const float3 result = v + v1 + v2;
+
+    return result;
+}
+
+template<typename T>
+constexpr auto vector_angle(const vector<T, 2>& a, const vector<T, 2>& b)
+{
+    const auto c = b - a;
+    const auto result = std::atan2(c.y, c.x);
+    return result;
+}
+
+template<typename T>
+constexpr auto vector_angle(const vector<T, 3>& a, const vector<T, 3>& b)
+{
+    const auto c = cross(a, b);
+    const auto l = length(c);
+    const auto d = dot(a, b);
+    const auto result = std::atan2(l, d);
+    return result;
+}
+
+template<typename T>
+constexpr auto perpendicular(const vector<T, 3>& v)
+{
+    auto min = std::abs(v.x);
+    vector<T, 3> axis(1, 0, 0);
+    if (std::abs(v.y) < min) {
+        min = std::abs(v.y);
+        axis = vector<T, 3>(0, 1, 0);
+    }
+    if (std::abs(v.z) < min)
+        axis = vector<T, 3>(0, 0, 1);
+    const vector<T, 3> result = cross(v, axis);
+    return result;
+}
+
+template<typename T>
+constexpr auto unproject(const vector<T, 3>& source, const matrix<T, 4, 4>& projection, const matrix<T, 4, 4>& view)
+{
+    const auto view_proj = mul(view, projection);
+    const auto inv_view_proj = inverse(view_proj);
+    const quaternion<T> quat(source.x, source.y, source.z, T(1));
+    const auto qtransformed = transform(quat, inv_view_proj);
+    const auto result = qtransformed.abc / qtransformed.d;
+    return result;
+}
+
+template<typename T>
+constexpr auto ortho_normalize(vector<T, 3>& v1, vector<T, 3>& v2)
+{
+    v1 = normalize(v1);
+    const auto vn1 = normalize(cross(v1, v2));
+    v2 = cross(vn1, v1);
+}
+
 template<size_t N>
 bool all_true(const vector<bool, N>& t)
 {
@@ -160,6 +233,22 @@ template<size_t N>
 bool any_true(const vector<bool, N>& t)
 {
     const bool result = std::apply([](auto&&...v) { return (v || ...); }, t.values);
+    return result;
+}
+
+template<typename T>
+constexpr auto rotate(const vector<T, 3>& v, const quaternion<T>& q)
+{
+    const vector<T, 3> a((q.x * q.x + q.w * q.w - q.y * q.y - q.z * q.z),
+                         (T(2) * q.x * q.y - T(2) * q.w * q.z),
+                         (T(2) * q.x * q.z + T(2) * q.w * q.y));
+    const vector<T, 3> b((T(2) * q.w * q.z + T(2) * q.x * q.y),
+                         (q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z),
+                         (T(-2) * q.w * q.x + T(2) * q.y * q.z));
+    const vector<T, 3> c((T(-2) * q.w * q.y + T(2) * q.x * q.z),
+                         (T(2) * q.w * q.x + T(2) * q.y * q.z),
+                         (q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z));
+    const vector<T, 3> result(dot(v, a), dot(v, b), dot(v, c));
     return result;
 }
 
