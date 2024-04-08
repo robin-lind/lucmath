@@ -131,17 +131,6 @@ constexpr auto diagonal_matrix(const vector<T, N>& v)
     return result;
 }
 
-template<typename T>
-constexpr auto quat_to_matrix(vector<T, 4> q)
-{
-    const matrix<T, 4, 4> m(
-      { q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z, (q.x * q.y + q.z * q.w) * T(2), (q.z * q.x - q.y * q.w) * T(2), T(0) },
-      { (q.x * q.y - q.z * q.w) * T(2), q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z, (q.y * q.z + q.x * q.w) * T(2), T(0) },
-      { (q.z * q.x + q.y * q.w) * T(2), (q.y * q.z - q.x * q.w) * T(2), q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z, T(0) },
-      { T(0), T(0), T(0), T(1) });
-    return m;
-}
-
 template<typename T, size_t R, size_t C>
 constexpr auto mul(const matrix<T, R, C>& m, const vector<T, R>& v)
 {
