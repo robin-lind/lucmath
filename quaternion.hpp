@@ -42,8 +42,8 @@ union quaternion {
 
     struct
     {
-        vector<T, 3> abc;
-        T d;
+        vector<T, 3> ijk;
+        T r;
     };
 
     struct
@@ -103,6 +103,13 @@ template<typename T>
 constexpr auto operator*(const quaternion<T>& lhs, const T& rhs)
 {
     const quaternion<T> result(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs, lhs.w * rhs);
+    return result;
+}
+
+template<typename T>
+constexpr auto operator*(const T& lhs, const quaternion<T>& rhs)
+{
+    const quaternion<T> result(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z, lhs * rhs.w);
     return result;
 }
 
@@ -300,14 +307,14 @@ auto slerp(const T& x, const quaternion<T>& a, const quaternion<T>& b)
 }
 
 template<typename T>
-constexpr auto from_euler(const T& pitch, const T& yaw, const T& roll)
+constexpr auto from_euler(const vector<T, 3>& e)
 {
-    const auto x0 = std::cos(pitch * T(.5));
-    const auto x1 = std::sin(pitch * T(.5));
-    const auto y0 = std::cos(yaw * T(.5));
-    const auto y1 = std::sin(yaw * T(.5));
-    const auto z0 = std::cos(roll * T(.5));
-    const auto z1 = std::sin(roll * T(.5));
+    const auto x0 = std::cos(e.x * T(.5));
+    const auto x1 = std::sin(e.x * T(.5));
+    const auto y0 = std::cos(e.y * T(.5));
+    const auto y1 = std::sin(e.y * T(.5));
+    const auto z0 = std::cos(e.z * T(.5));
+    const auto z1 = std::sin(e.z * T(.5));
     const math::quaternion<T> result(
       x1 * y0 * z0 - x0 * y1 * z1,
       x0 * y1 * z0 + x1 * y0 * z1,
@@ -317,22 +324,25 @@ constexpr auto from_euler(const T& pitch, const T& yaw, const T& roll)
 }
 
 template<typename T>
-vector<T, 3> to_euler(const quaternion<T>& q)
+constexpr auto from_euler(const T& pitch, const T& roll, const T& yaw)
+{
+    return from_euler(vector<T, 3>(pitch, roll, yaw));
+}
+
+template<typename T>
+constexpr auto to_euler(const quaternion<T>& q)
 {
     const auto x0 = T(2) * (q.w * q.x + q.y * q.z);
     const auto x1 = T(1) - T(2) * (q.x * q.x + q.y * q.y);
-
-    const auto y = T(2) * (q.w * q.y - q.z * q.x);
-    const auto y0 = y > T(1) ? T(1) : y;
-    const auto y1 = y0 < -T(1) ? -T(1) : y0;
-
+    const auto y0 = T(2) * (q.w * q.y - q.z * q.x);
+    const auto y1 = y0 > T(1) ? T(1) : y0;
+    const auto y2 = y1 < -T(1) ? -T(1) : y1;
     const auto z0 = T(2) * (q.w * q.z + q.x * q.y);
     const auto z1 = T(1) - T(2) * (q.y * q.y + q.z * q.z);
-
-    const vector<T, 3> result(
-      std::atan2(x0, x1),
-      std::asin(y1),
-      std::atan2(z0, z1));
+    const auto x = std::atan2(x0, x1);
+    const auto y = std::asin(y2);
+    const auto z = std::atan2(z0, z1);
+    const vector<T, 3> result(x, y, z);
     return result;
 }
 

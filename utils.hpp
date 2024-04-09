@@ -211,7 +211,7 @@ constexpr auto unproject(const vector<T, 3>& source, const matrix<T, 4, 4>& proj
     const auto inv_view_proj = inverse(view_proj);
     const quaternion<T> quat(source.x, source.y, source.z, T(1));
     const auto qtransformed = transform(quat, inv_view_proj);
-    const auto result = qtransformed.abc / qtransformed.d;
+    const auto result = qtransformed.ijk / qtransformed.r;
     return result;
 }
 
