@@ -400,6 +400,14 @@ constexpr auto length(const vector<T, N>& a)
 }
 
 template<typename T, size_t N>
+constexpr auto length_non_zero(const vector<T, N>& a)
+{
+    const auto len = length_squared(a);
+    const auto result = len > std::numeric_limits<T>::epsilon();
+    return result;
+}
+
+template<typename T, size_t N>
 constexpr auto distance_squared(const vector<T, N>& a, const vector<T, N>& b)
 {
     const auto result = length_squared(a - b);
@@ -410,6 +418,13 @@ template<typename T, size_t N>
 constexpr auto distance(const vector<T, N>& a, const vector<T, N>& b)
 {
     const auto result = length(a - b);
+    return result;
+}
+
+template<typename T, size_t N>
+constexpr auto distance_non_zero(const vector<T, N>& a, const vector<T, N>& b)
+{
+    const auto result = length_non_zero(a - b);
     return result;
 }
 
