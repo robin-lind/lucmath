@@ -23,6 +23,7 @@
 #ifndef DEKKER_MATH_H
 #define DEKKER_MATH_H
 
+#include "vector.hpp"
 #include <cmath>
 
 namespace math {
@@ -180,6 +181,13 @@ constexpr auto operator-(const dekker& t)
     return t * -1.0;
 }
 
+template<size_t N>
+constexpr auto length(const vector<dekker, N>& a)
+{
+    const auto result = math::dekker_split(sqrt(length_squared(a).d()));
+    return result;
+}
+
 using dekker2 = vector<dekker, 2>;
 using dekker3 = vector<dekker, 3>;
 using dekker4 = vector<dekker, 4>;
@@ -194,13 +202,5 @@ constexpr auto operator""_dk(unsigned long long x)
 {
     return math::dekker(double(x));
 }
-
-namespace std {
-math::dekker sqrt(const math::dekker& x)
-{
-    // this is terrible
-    return math::dekker_split(sqrt(x.d()));
-}
-} // namespace std
 
 #endif /* DEKKER_MATH_H */

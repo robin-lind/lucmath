@@ -45,17 +45,17 @@ struct bounds {
             extend(v);
     }
 
-    auto& extend(const bounds<T, N>& t)
-    {
-        extend(t.min);
-        extend(t.max);
-        return *this;
-    }
-
     auto& extend(const vector<T, N>& t)
     {
         min = math::min(min, t);
         max = math::max(max, t);
+        return *this;
+    }
+
+    auto& extend(const bounds<T, N>& t)
+    {
+        extend(t.min);
+        extend(t.max);
         return *this;
     }
 

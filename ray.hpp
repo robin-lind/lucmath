@@ -24,7 +24,6 @@
 #define RAY_MATH_H
 
 #include "vector.hpp"
-#include "utils.hpp"
 #include <array>
 #include <numeric>
 

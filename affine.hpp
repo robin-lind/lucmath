@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef AFFINE_H
-#define AFFINE_H
+#ifndef AFFINE_MATH_H
+#define AFFINE_MATH_H
 
 #include "vector.hpp"
 #include "matrix.hpp"
@@ -78,4 +78,4 @@ constexpr auto inverse(const affine<T>& aff)
 
 } // namespace math
 
-#endif /* AFFINE_H */
+#endif /* AFFINE_MATH_H */

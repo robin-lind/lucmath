@@ -25,7 +25,6 @@
 
 #include "vector.hpp"
 #include "matrix.hpp"
-#include "utils.hpp"
 #include <array>
 #include <numeric>
 

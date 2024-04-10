@@ -339,7 +339,7 @@ constexpr auto orthographic(const T& left, const T& right, const T& bottom, cons
 }
 
 template<typename T>
-constexpr auto rotate(const vector<T, 3>& axis, const T& angle)
+constexpr auto rotation(const vector<T, 3>& axis, const T& angle)
 {
     const auto na = normalize(axis);
     const auto s = std::sin(angle);
