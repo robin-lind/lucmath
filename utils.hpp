@@ -88,6 +88,12 @@ constexpr auto clamp(const T& x, const T& min, const T& max)
 }
 
 template<typename T>
+constexpr auto bounded(const T& x, const T& min, const T& max)
+{
+    return (min < x) && (x < max);
+}
+
+template<typename T>
 auto wrap(const T& x, const T& min, const T& max)
 {
     const auto range = max - min;
@@ -172,10 +178,11 @@ constexpr auto rotate_axis_angle(const vector<T, N>& v, const vector<T, N>& axis
 }
 
 template<typename T>
-constexpr auto vector_angle(const vector<T, 2>& a, const vector<T, 2>& b)
+constexpr auto separation_angle(const vector<T, 2>& a, const vector<T, 2>& b)
 {
-    const auto c = b - a;
-    const auto result = std::atan2(c.y, c.x);
+    const auto angle_a = std::atan2(a.y, a.x);
+    const auto angle_b = std::atan2(b.y, b.x);
+    const auto result = angle_b - angle_a;
     return result;
 }
 
@@ -255,9 +262,14 @@ constexpr auto rotate(const vector<T, 3>& v, const quaternion<T>& q)
 
 template<typename T>
 struct ortho_normal_base {
-    vector<T, 3> tangent, bi_tangent, normal;
+    vector<T, 3> tangent, bitangent, normal;
 
     ortho_normal_base() = default;
+
+    ortho_normal_base(const vector<T, 3>& tangent, const vector<T, 3>& bitangent, const vector<T, 3>& normal) :
+      tangent(tangent), bitangent(bitangent), normal(normal)
+    {
+    }
 
     ortho_normal_base(const vector<T, 3>& normal) :
       normal(normal)
@@ -266,17 +278,17 @@ struct ortho_normal_base {
         const auto a = static_cast<T>(-1) / (sign_z + normal.z);
         const auto b = normal.x * normal.y * a;
         tangent = vector<T, 3>(static_cast<T>(1) + sign_z * normal.x * normal.x * a, sign_z * b, -sign_z * normal.x);
-        bi_tangent = vector<T, 3>(b, sign_z + normal.y * normal.y * a, -normal.y);
+        bitangent = vector<T, 3>(b, sign_z + normal.y * normal.y * a, -normal.y);
     }
 
     vector<T, 3> local(const vector<T, 3>& dir) const
     {
-        return { dot(dir, tangent), dot(dir, bi_tangent), dot(dir, normal) };
+        return { dot(dir, tangent), dot(dir, bitangent), dot(dir, normal) };
     }
 
     vector<T, 3> world(const vector<T, 3>& dir) const
     {
-        return dir.x * tangent + dir.y * bi_tangent + dir.z * normal;
+        return dir.x * tangent + dir.y * bitangent + dir.z * normal;
     }
 };
 
