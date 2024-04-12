@@ -35,7 +35,7 @@ template<typename T, size_t N>
 constexpr auto min(const vector<T, N>& t, const vector<T, N>& u)
 {
     const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
-        return std::array<T, N>{ std::min(std::get<I>(t.values), std::get<I>(u.values))... };
+        return std::array<T, N>{ std::min(std::get<I>(t.as_array()), std::get<I>(u.as_array()))... };
     }(std::make_index_sequence<N>{});
     return vector<T, N>(result);
 }
@@ -44,7 +44,7 @@ template<typename T, size_t N>
 constexpr auto max(const vector<T, N>& t, const vector<T, N>& u)
 {
     const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
-        return std::array<T, N>{ std::max(std::get<I>(t.values), std::get<I>(u.values))... };
+        return std::array<T, N>{ std::max(std::get<I>(t.as_array()), std::get<I>(u.as_array()))... };
     }(std::make_index_sequence<N>{});
     return vector<T, N>(result);
 }
@@ -53,7 +53,7 @@ template<typename T, size_t N>
 constexpr auto min(const vector<T, N>& t, const T& u)
 {
     const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
-        return std::array<T, N>{ std::min(std::get<I>(t.values), u)... };
+        return std::array<T, N>{ std::min(std::get<I>(t.as_array()), u)... };
     }(std::make_index_sequence<N>{});
     return vector<T, N>(result);
 }
@@ -62,7 +62,7 @@ template<typename T, size_t N>
 constexpr auto max(const vector<T, N>& t, const T& u)
 {
     const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
-        return std::array<T, N>{ std::max(std::get<I>(t.values), u)... };
+        return std::array<T, N>{ std::max(std::get<I>(t.as_array()), u)... };
     }(std::make_index_sequence<N>{});
     return vector<T, N>(result);
 }
@@ -116,7 +116,7 @@ template<typename T, size_t N>
 constexpr auto sanitize(const vector<T, N>& v)
 {
     const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
-        return std::array<T, N>{ sanitize(std::get<I>(v.values))... };
+        return std::array<T, N>{ sanitize(std::get<I>(v.as_array()))... };
     }(std::make_index_sequence<N>{});
     return vector<T, N>(result);
 }
@@ -131,7 +131,7 @@ template<typename T, size_t N>
 constexpr auto saturate(const vector<T, N>& v)
 {
     const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
-        return std::array<T, N>{ saturate(std::get<I>(v.values))... };
+        return std::array<T, N>{ saturate(std::get<I>(v.as_array()))... };
     }(std::make_index_sequence<N>{});
     return vector<T, N>(result);
 }

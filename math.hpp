@@ -29,3 +29,4 @@
 #include "ray.hpp"
 #include "triangle.hpp"
 #include "utils.hpp"
+#include "swizzle.hpp"

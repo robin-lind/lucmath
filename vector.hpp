@@ -28,12 +28,13 @@
 #include <functional>
 #include <limits>
 #include <cstdint>
+#include <type_traits>
 
 namespace math {
 
 template<typename T, size_t N>
-union vector {
-    constexpr vector() :
+struct vector {
+    vector() :
       vector(T()) {}
 
     constexpr vector(const T& t)
@@ -44,311 +45,344 @@ union vector {
     constexpr vector(const std::array<T, N>& a) :
       values(a) {}
 
+    T& operator[](std::size_t i)
+    {
+        return values[i];
+    }
+
+    const T& operator[](std::size_t i) const
+    {
+        return values[i];
+    }
+
+    auto as_array() const
+    {
+        return values;
+    }
+
     std::array<T, N> values{};
 };
 
 template<typename T>
-union vector<T, 1> {
-    constexpr vector() :
+struct vector<T, 1> {
+    vector() :
       vector(T()) {}
 
-    constexpr vector(const T& t) :
-      values{ t } {}
+    constexpr vector(const T& x) :
+      x(x) {}
 
     constexpr vector(const std::array<T, 1>& a) :
-      values(a) {}
-
-    T t;
-    std::array<T, 1> values{};
+      x(a[0]) {}
 
     operator T &()
     {
-        return t;
+        return x;
     }
 
     operator T() const
     {
-        return t;
+        return x;
     }
+
+    T& operator[](std::size_t i)
+    {
+        return (&x)[i];
+    }
+
+    const T& operator[](std::size_t i) const
+    {
+        return (&x)[i];
+    }
+
+    auto as_array() const
+    {
+        const std::array<T, 1>& result{ x };
+        return result;
+    }
+
+    T x;
 };
 
 template<typename T>
-union vector<T, 2> {
-    constexpr vector() :
+struct vector<T, 2> {
+    vector() :
       vector(T()) {}
 
     constexpr vector(const T& t) :
-      values{ t, t } {}
+      x(t), y(t) {}
 
-    constexpr vector(const T& _x, const T& _y) :
-      values{ _x, _y } {}
+    constexpr vector(const T& x, const T& y) :
+      x(x), y(y) {}
 
     constexpr vector(const std::array<T, 2>& a) :
-      values(a) {}
+      x(a[0]), y(a[1]) {}
 
-    struct
+    T& operator[](std::size_t i)
     {
-        T x;
-        T y;
-    };
+        return (&x)[i];
+    }
 
-    struct
+    const T& operator[](std::size_t i) const
     {
-        T u;
-        T v;
-    };
+        return (&x)[i];
+    }
 
-    struct
+    auto as_array() const
     {
-        T w;
-        T h;
-    };
+        const std::array<T, 2>& result{ x, y };
+        return result;
+    }
 
-    std::array<T, 2> values{};
+    T x, y;
 };
 
 template<typename T>
-union vector<T, 3> {
-    constexpr vector() :
+struct vector<T, 3> {
+    vector() :
       vector(T()) {}
 
     constexpr vector(const T& t) :
-      values{ t, t, t } {}
+      x(t), y(t), z(t) {}
 
-    constexpr vector(const T& _x, const T& _y, const T& _z) :
-      values{ _x, _y, _z } {}
+    constexpr vector(const T& x, const T& y, const T& z) :
+      x(x), y(y), z(z) {}
 
     constexpr vector(const vector<T, 2>& _xy, const T& _z) :
-      values{ _xy.x, _xy.y, _z } {}
+      x(_xy.x), y(_xy.y), z(_z) {}
 
     constexpr vector(const T& _x, const vector<T, 2>& _yz) :
-      values{ _x, _yz.x, _yz.y } {}
+      x(_x), y(_yz.x), z(_yz.y) {}
 
     constexpr vector(const std::array<T, 3>& a) :
-      values(a) {}
+      x(a[0]), y(a[1]), z(a[2]) {}
 
-    struct
+    T& operator[](std::size_t i)
     {
-        T x;
-        T y;
-        T z;
-    };
+        return (&x)[i];
+    }
 
-    struct
+    const T& operator[](std::size_t i) const
     {
-        T r;
-        T g;
-        T b;
-    };
+        return (&x)[i];
+    }
 
-    struct
+    auto as_array() const
     {
-        T u;
-        T v;
-        T w;
-    };
+        const std::array<T, 3>& result{ x, y, z };
+        return result;
+    }
 
-    struct
-    {
-        vector<T, 2> uv;
-    };
-
-    std::array<T, 3> values{};
+    T x, y, z;
 };
 
 template<typename T>
-union vector<T, 4> {
-    constexpr vector() :
+struct vector<T, 4> {
+    vector() :
       vector(T()) {}
 
     constexpr vector(const T& t) :
-      values{ t, t, t, t } {}
+      x(t), y(t), z(t), w(t) {}
 
-    constexpr vector(const T& _x, const T& _y, const T& _z, const T& _w) :
-      values{ _x, _y, _z, _w } {}
+    constexpr vector(const T& x, const T& y, const T& z, const T& w) :
+      x(x), y(y), z(z), w(w) {}
 
     constexpr vector(const vector<T, 2>& _xy, const T& _z, const T& _w) :
-      values{ _xy.x, _xy.y, _z, _w } {}
+      x(_xy.x), y(_xy.y), z(_z), w(_w) {}
 
     constexpr vector(const vector<T, 3>& _xyz, const T& _w) :
-      values{ _xyz.x, _xyz.y, _xyz.z, _w } {}
+      x(_xyz.x), y(_xyz.y), z(_xyz.z), w(_w) {}
 
     constexpr vector(const vector<T, 2>& _xy, const vector<T, 2>& _zw) :
-      values{ _xy.x, _xy.y, _zw.x, _zw.y } {}
+      x(_xy.x), y(_xy.y), z(_zw.x), w(_zw.y) {}
 
     constexpr vector(const T& _x, const vector<T, 3>& _yzw) :
-      values{ _x, _yzw.x, _yzw.y, _yzw.z } {}
+      x(_x), y(_yzw.x), z(_yzw.y), w(_yzw.z) {}
 
     constexpr vector(const T& _x, const vector<T, 2>& _yz, const T& _w) :
-      values{ _x, _yz.x, _yz.y, _w } {}
+      x(_x), y(_yz.x), z(_yz.y), w(_w) {}
 
     constexpr vector(const T& _x, const T& _y, const vector<T, 2>& _zw) :
-      values{ _x, _y, _zw.x, _zw.y } {}
+      x(_x), y(_y), z(_zw.x), w(_zw.y) {}
 
     constexpr vector(const std::array<T, 4>& a) :
-      values(a) {}
+      x(a[0]), y(a[1]), z(a[2]), w(a[3]) {}
 
-    struct
+    T& operator[](std::size_t i)
     {
-        T x;
-        T y;
-        T z;
-        T w;
-    };
+        return (&x)[i];
+    }
 
-    struct
+    const T& operator[](std::size_t i) const
     {
-        T r;
-        T g;
-        T b;
-        T a;
-    };
+        return (&x)[i];
+    }
 
-    struct
+    auto as_array() const
     {
-        vector<T, 3> xyz;
-    };
+        const std::array<T, 4>& result{ x, y, z, w };
+        return result;
+    }
 
-    struct
-    {
-        vector<T, 3> uvw;
-    };
-
-    struct
-    {
-        vector<T, 3> rgb;
-    };
-
-    struct
-    {
-        vector<T, 2> uv;
-    };
-
-    std::array<T, 4> values{};
+    T x, y, z, w;
 };
 
-#define vector_vector_arithmetic_op(op) \
-template<typename T, size_t N> \
-constexpr auto operator op (const vector<T, N>& lhs, const vector<T, N>& rhs) \
-{ \
-    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
-    { \
-        return std::array<T, N>{std::get<I>(lhs.values) op std::get<I>(rhs.values)...}; \
-    } \
-    (std::make_index_sequence<N>{}); \
-    return vector<T, N>(result); \
-}
-#define vector_scalar_arithmetic_op(op) \
-template<typename T, size_t N> \
-constexpr auto operator op (const vector<T, N>& lhs, const T& rhs) \
-{ \
-    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
-    { \
-        return std::array<T, N>{std::get<I>(lhs.values) op rhs...}; \
-    } \
-    (std::make_index_sequence<N>{}); \
-    return vector<T, N>(result); \
-}
-#define scalar_vector_arithmetic_op(op) \
-template<typename T, size_t N> \
-constexpr auto operator op (const T& lhs, const vector<T, N>& rhs) \
-{ \
-    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) \
-    { \
-        return std::array<T, N>{lhs op std::get<I>(rhs.values)...}; \
-    } \
-    (std::make_index_sequence<N>{}); \
-    return vector<T, N>(result); \
-}
+template<typename T>
+concept math_scalar = std::is_arithmetic_v<T>;
 
-#define vector_arithmetic_op(op) \
-vector_vector_arithmetic_op(op) \
-vector_scalar_arithmetic_op(op) \
-scalar_vector_arithmetic_op(op)
+template<typename T>
+concept math_vector = requires(T v) {
+    v.as_array();
+};
 
-#define every_arithmetic_op(macro) \
-macro(+) \
-macro(-) \
-macro(*) \
-macro(/)
-// macro(<) \
-// macro(<=) \
-// macro(>) \
-// macro(>=) \
-// macro(==) \
-// macro(!=)
+template<typename T>
+concept vector_or_scalar = math_vector<T> || std::is_arithmetic_v<T>;
 
-#define vector_vector_assignment_op(op,opequals) \
-template<typename T, size_t N> \
-constexpr auto operator opequals (vector<T, N>& lhs, const vector<T, N>& rhs) \
-{ \
-	lhs = lhs op rhs; \
-}
-
-#define vector_t_assignment_op(op,opequals) \
-template<typename T, size_t N> \
-constexpr auto operator opequals (vector<T, N>& lhs, const T& rhs) \
-{ \
-	lhs = lhs op rhs; \
-}
-
-#define vector_assignment_op(op,opequals) \
-vector_vector_assignment_op(op,opequals) \
-vector_t_assignment_op(op,opequals)
-
-#define every_assignment_op(macro) \
-macro(+,+=) \
-macro(-,-=) \
-macro(*,*=) \
-macro(/,/=)
-
-every_arithmetic_op(vector_arithmetic_op)
-every_assignment_op(vector_assignment_op)
-
-template<typename T, size_t N>
-constexpr auto operator-(const vector<T, N>& t)
+template<typename Op, math_scalar T, size_t N>
+constexpr auto binary_op(const std::array<T, N>& lhs, const std::array<T, N>& rhs)
 {
     const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
-        return std::array<T, N>{ -std::get<I>(t.values)... };
+        return std::array<T, N>{ Op{}(std::get<I>(lhs), std::get<I>(rhs))... };
     }(std::make_index_sequence<N>{});
     return vector<T, N>(result);
 }
 
-using float2 = vector<float, 2>;
-using float3 = vector<float, 3>;
-using float4 = vector<float, 4>;
+template<typename Op, math_scalar T, size_t N>
+constexpr auto binary_op(const std::array<T, N>& lhs, const T& rhs)
+{
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
+        return std::array<T, N>{ Op{}(std::get<I>(lhs), rhs)... };
+    }(std::make_index_sequence<N>{});
+    return vector<T, N>(result);
+}
 
-using double2 = vector<double, 2>;
-using double3 = vector<double, 3>;
-using double4 = vector<double, 4>;
+template<typename Op, math_scalar T, size_t N>
+constexpr auto binary_op(const T& lhs, const std::array<T, N>& rhs)
+{
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
+        return std::array<T, N>{ Op{}(lhs, std::get<I>(rhs))... };
+    }(std::make_index_sequence<N>{});
+    return vector<T, N>(result);
+}
 
-using short2 = vector<int16_t, 2>;
-using short3 = vector<int16_t, 3>;
-using short4 = vector<int16_t, 4>;
+template<typename Op, math_vector T, math_vector U>
+constexpr auto binary(const T& lhs, const U& rhs)
+{
+    return binary_op<Op>(lhs.as_array(), rhs.as_array());
+}
 
-using int2 = vector<int32_t, 2>;
-using int3 = vector<int32_t, 3>;
-using int4 = vector<int32_t, 4>;
+template<typename Op, math_vector T, math_scalar U>
+constexpr auto binary(const T& lhs, const U& rhs)
+{
+    return binary_op<Op>(lhs.as_array(), rhs);
+}
 
-using long2 = vector<int64_t, 2>;
-using long3 = vector<int64_t, 3>;
-using long4 = vector<int64_t, 4>;
+template<typename Op, math_scalar T, math_vector U>
+constexpr auto binary(const T& lhs, const U& rhs)
+{
+    return binary_op<Op>(lhs, rhs.as_array());
+}
 
-using ushort2 = vector<uint16_t, 2>;
-using ushort3 = vector<uint16_t, 3>;
-using ushort4 = vector<uint16_t, 4>;
+template<vector_or_scalar T, vector_or_scalar U>
+constexpr auto add(const T& lhs, const U& rhs)
+{
+    const auto result = binary<std::plus<void>>(lhs, rhs);
+    return result;
+}
 
-using uint2 = vector<uint32_t, 2>;
-using uint3 = vector<uint32_t, 3>;
-using uint4 = vector<uint32_t, 4>;
+template<vector_or_scalar T, vector_or_scalar U>
+constexpr auto sub(const T& lhs, const U& rhs)
+{
+    const auto result = binary<std::minus<void>>(lhs, rhs);
+    return result;
+}
 
-using ulong2 = vector<uint64_t, 2>;
-using ulong3 = vector<uint64_t, 3>;
-using ulong4 = vector<uint64_t, 4>;
+template<vector_or_scalar T, vector_or_scalar U>
+constexpr auto mul(const T& lhs, const U& rhs)
+{
+    const auto result = binary<std::multiplies<void>>(lhs, rhs);
+    return result;
+}
 
-using bool2 = vector<bool, 2>;
-using bool3 = vector<bool, 3>;
-using bool4 = vector<bool, 4>;
+template<vector_or_scalar T, vector_or_scalar U>
+constexpr auto div(const T& lhs, const U& rhs)
+{
+    const auto result = binary<std::divides<void>>(lhs, rhs);
+    return result;
+}
+
+template<vector_or_scalar T, vector_or_scalar U>
+constexpr auto operator+(const T& lhs, const U& rhs)
+{
+    const auto result = add(lhs, rhs);
+    return result;
+}
+
+template<vector_or_scalar T, vector_or_scalar U>
+constexpr auto operator-(const T& lhs, const U& rhs)
+{
+    const auto result = sub(lhs, rhs);
+    return result;
+}
+
+template<vector_or_scalar T, vector_or_scalar U>
+constexpr auto operator*(const T& lhs, const U& rhs)
+{
+    const auto result = mul(lhs, rhs);
+    return result;
+}
+
+template<vector_or_scalar T, vector_or_scalar U>
+constexpr auto operator/(const T& lhs, const U& rhs)
+{
+    const auto result = div(lhs, rhs);
+    return result;
+}
+
+template<math_vector T, vector_or_scalar U>
+constexpr auto operator+=(T& lhs, const U& rhs)
+{
+    lhs = lhs + rhs;
+}
+
+template<math_vector T, vector_or_scalar U>
+constexpr auto operator-=(T& lhs, const U& rhs)
+{
+    lhs = lhs - rhs;
+}
+
+template<math_vector T, vector_or_scalar U>
+constexpr auto operator*=(T& lhs, const U& rhs)
+{
+    lhs = lhs * rhs;
+}
+
+template<math_vector T, vector_or_scalar U>
+constexpr auto operator/=(T& lhs, const U& rhs)
+{
+    lhs = lhs / rhs;
+}
+
+template<typename Op, math_scalar T, size_t N>
+constexpr auto unary_op(const std::array<T, N>& v)
+{
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
+        return std::array<T, N>{ Op{}(std::get<I>(v))... };
+    }(std::make_index_sequence<N>{});
+    return vector<T, N>(result);
+}
+
+template<typename Op, math_vector T>
+constexpr auto unary(const T& v)
+{
+    return unary_op<Op>(v.as_array());
+}
+
+template<math_vector T>
+constexpr auto operator-(const T& v)
+{
+    const auto result = unary<std::negate<void>>(v);
+    return result;
+}
 
 template<typename Op = std::plus<void>, typename T, size_t N>
 constexpr auto collapse(const vector<T, N>& a)
@@ -441,6 +475,42 @@ constexpr auto normalized_with_length(const vector<T, N>& a)
     const auto l = length(a);
     return std::make_tuple(a / l, l);
 }
+
+using float2 = vector<float, 2>;
+using float3 = vector<float, 3>;
+using float4 = vector<float, 4>;
+
+using double2 = vector<double, 2>;
+using double3 = vector<double, 3>;
+using double4 = vector<double, 4>;
+
+using short2 = vector<int16_t, 2>;
+using short3 = vector<int16_t, 3>;
+using short4 = vector<int16_t, 4>;
+
+using int2 = vector<int32_t, 2>;
+using int3 = vector<int32_t, 3>;
+using int4 = vector<int32_t, 4>;
+
+using long2 = vector<int64_t, 2>;
+using long3 = vector<int64_t, 3>;
+using long4 = vector<int64_t, 4>;
+
+using ushort2 = vector<uint16_t, 2>;
+using ushort3 = vector<uint16_t, 3>;
+using ushort4 = vector<uint16_t, 4>;
+
+using uint2 = vector<uint32_t, 2>;
+using uint3 = vector<uint32_t, 3>;
+using uint4 = vector<uint32_t, 4>;
+
+using ulong2 = vector<uint64_t, 2>;
+using ulong3 = vector<uint64_t, 3>;
+using ulong4 = vector<uint64_t, 4>;
+
+using bool2 = vector<bool, 2>;
+using bool3 = vector<bool, 3>;
+using bool4 = vector<bool, 4>;
 
 }; // namespace math
 

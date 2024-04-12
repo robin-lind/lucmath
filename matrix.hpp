@@ -27,6 +27,7 @@
 #define MATRIX_MATH_H
 
 #include "vector.hpp"
+#include "swizzle.hpp"
 #include <array>
 #include <algorithm>
 #include <cstddef>
@@ -61,6 +62,16 @@ union matrix {
     matrix(const std::array<vector<T, R>, C>& c) :
       columns(c) {}
 
+    T& operator[](std::size_t i)
+    {
+        return values[i];
+    }
+
+    const T& operator[](std::size_t i) const
+    {
+        return values[i];
+    }
+
     std::array<vector<T, R>, C> columns;
     std::array<T, R * C> values{};
 };
@@ -83,6 +94,16 @@ union matrix<T, 3, 3> {
 
     matrix(const vector<T, 3>& _x, const vector<T, 3>& _y, const vector<T, 3>& _z) :
       x(_x), y(_y), z(_z) {}
+
+    T& operator[](std::size_t i)
+    {
+        return values[i];
+    }
+
+    const T& operator[](std::size_t i) const
+    {
+        return values[i];
+    }
 
     std::array<vector<T, 3>, 3> columns;
     std::array<T, 9> values{};
@@ -112,6 +133,16 @@ union matrix<T, 4, 4> {
     matrix(const vector<T, 4>& _x, const vector<T, 4>& _y, const vector<T, 4>& _z, const vector<T, 4>& _w) :
       x(_x), y(_y), z(_z), w(_w) {}
 
+    T& operator[](std::size_t i)
+    {
+        return values[i];
+    }
+
+    const T& operator[](std::size_t i) const
+    {
+        return values[i];
+    }
+
     std::array<vector<T, 4>, 4> columns;
     std::array<T, 16> values{};
 
@@ -135,7 +166,7 @@ template<typename T, size_t R, size_t C>
 constexpr auto mul(const matrix<T, R, C>& m, const vector<T, R>& v)
 {
     const auto e = [&]<std::size_t... I>(std::index_sequence<I...>) {
-        return std::array<vector<T, R>, C>{ std::get<I>(m.columns) * std::get<I>(v.values)... };
+        return std::array<vector<T, R>, C>{ std::get<I>(m.columns) * std::get<I>(v.as_array())... };
     }(std::make_index_sequence<C>{});
     auto result = e[0];
     for (size_t i = 1; i < C; i++)
@@ -159,9 +190,9 @@ constexpr auto scale(const vector<T, N>& v)
     constexpr auto countN = std::min(countRC, N);
     matrix<T, R, C> result;
     for (size_t i = 0; i < countRC; i++)
-        result.columns[i].values[i] = static_cast<T>(1);
+        result.columns[i][i] = static_cast<T>(1);
     for (size_t i = 0; i < countN; i++)
-        result.columns[i].values[i] = v.values[i];
+        result.columns[i][i] = v[i];
     return result;
 }
 
@@ -169,7 +200,9 @@ template<typename T>
 constexpr auto translation(const vector<T, 3>& v)
 {
     matrix<T, 4, 4> result;
-    result.w.xyz = v;
+    result[12] = v.x;
+    result[13] = v.y;
+    result[14] = v.z;
     return result;
 }
 
@@ -179,7 +212,7 @@ constexpr auto transpose(const matrix<T, R, C>& m)
     matrix<T, C, R> result;
     for (size_t c = 0; c < C; c++)
         for (size_t r = 0; r < R; r++)
-            result.columns[r].values[c] = m.columns[c].values[r];
+            result.columns[r][c] = m.columns[c][r];
     return result;
 }
 
