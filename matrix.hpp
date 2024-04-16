@@ -163,7 +163,7 @@ constexpr auto diagonal_matrix(const vector<T, N>& v)
 }
 
 template<typename T, size_t R, size_t C>
-constexpr auto mul(const matrix<T, R, C>& m, const vector<T, R>& v)
+constexpr auto mul(const vector<T, R>& v, const matrix<T, R, C>& m)
 {
     const auto e = [&]<std::size_t... I>(std::index_sequence<I...>) {
         return std::array<vector<T, R>, C>{ std::get<I>(m.columns) * std::get<I>(v.as_array())... };
@@ -178,7 +178,7 @@ template<typename T, size_t R, size_t C>
 constexpr auto mul(const matrix<T, R, C>& a, const matrix<T, R, C>& b)
 {
     const matrix<T, R, C> result([&]<std::size_t... I>(std::index_sequence<I...>) {
-        return std::array<vector<T, C>, R>{ mul(b, std::get<I>(a.columns))... };
+        return std::array<vector<T, C>, R>{ mul(std::get<I>(b.columns), a)... };
     }(std::make_index_sequence<R>{}));
     return result;
 }

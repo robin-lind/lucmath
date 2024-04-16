@@ -214,7 +214,7 @@ constexpr auto perpendicular(const vector<T, 3>& v)
 template<typename T>
 constexpr auto unproject(const vector<T, 3>& source, const matrix<T, 4, 4>& projection, const matrix<T, 4, 4>& view)
 {
-    const auto view_proj = mul(transpose(view), projection); // why does view need to be transposed now?!
+    const auto view_proj = mul(projection, transpose(view)); // why does view need to be transposed now?!
     const auto inv_view_proj = inverse(view_proj);
     const quaternion<T> quat(source.x, source.y, source.z, T(1));
     const auto qtransformed = transform(quat, inv_view_proj);
