@@ -399,6 +399,8 @@ constexpr auto rotation(const vector<T, 3>& axis, const T& angle)
 
 using matrix3 = matrix<float, 3, 3>;
 using matrix4 = matrix<float, 4, 4>;
+using matrixd3 = matrix<double, 3, 3>;
+using matrixd4 = matrix<double, 4, 4>;
 
 }; // namespace math
 
