@@ -397,6 +397,15 @@ constexpr auto rotation(const vector<T, 3>& axis, const T& angle)
     return result;
 }
 
+template<math_scalar T, math_scalar U, size_t R, size_t C>
+constexpr auto cast(const matrix<U, R, C>& m)
+{
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
+        return std::array<T, R * C>{ T(std::get<I>(m.values))... };
+    }(std::make_index_sequence<R * C>{});
+    return matrix<T, R, C>(result);
+}
+
 using matrix3 = matrix<float, 3, 3>;
 using matrix4 = matrix<float, 4, 4>;
 using matrixd3 = matrix<double, 3, 3>;

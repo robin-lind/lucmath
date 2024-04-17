@@ -476,6 +476,15 @@ constexpr auto normalized_with_length(const vector<T, N>& a)
     return std::make_tuple(a / l, l);
 }
 
+template<math_scalar T, math_scalar U, size_t N>
+constexpr auto cast(const vector<U, N>& v)
+{
+    const auto result = [&]<std::size_t... I>(std::index_sequence<I...>) {
+        return std::array<T, N>{ T(std::get<I>(v.as_array()))... };
+    }(std::make_index_sequence<N>{});
+    return vector<T, N>(result);
+}
+
 using float2 = vector<float, 2>;
 using float3 = vector<float, 3>;
 using float4 = vector<float, 4>;

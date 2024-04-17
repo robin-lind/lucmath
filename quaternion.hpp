@@ -345,6 +345,13 @@ constexpr auto to_euler(const quaternion<T>& q)
     return result;
 }
 
+template<math_scalar T, math_scalar U>
+constexpr auto cast(const quaternion<U>& q)
+{
+    const quaternion<T> result(q.x, q.y, q.z, q.w);
+    return result;
+}
+
 using quaternionf = quaternion<float>;
 using quaterniond = quaternion<double>;
 
