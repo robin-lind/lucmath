@@ -137,6 +137,16 @@ constexpr auto saturate(const vector<T, N>& v)
 }
 
 template<typename T>
+constexpr auto sign(const T& x)
+{
+    if (x > T(0))
+        return T(1);
+    if (x < T(0))
+        return T(-1);
+    return T(0);
+}
+
+template<typename T>
 constexpr auto reflect(const vector<T, 3>& w, const vector<T, 3>& n)
 {
     const auto result = n * (dot(n, w) * static_cast<T>(2)) - w;
@@ -178,10 +188,17 @@ constexpr auto rotate_axis_angle(const vector<T, N>& v, const vector<T, N>& axis
 }
 
 template<typename T>
+constexpr auto atan2(const vector<T, 2>& v)
+{
+    const auto result = std::atan2(v.y, v.x);
+    return result;
+}
+
+template<typename T>
 constexpr auto separation_angle(const vector<T, 2>& a, const vector<T, 2>& b)
 {
-    const auto angle_a = std::atan2(a.y, a.x);
-    const auto angle_b = std::atan2(b.y, b.x);
+    const auto angle_a = atan2(a);
+    const auto angle_b = atan2(b);
     const auto result = angle_b - angle_a;
     return result;
 }
