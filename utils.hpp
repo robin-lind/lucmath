@@ -278,6 +278,14 @@ constexpr auto rotate(const vector<T, 3>& v, const quaternion<T>& q)
 }
 
 template<typename T>
+auto same_hemisphere(const vector<T, 3>& a, const vector<T, 3>& b)
+{
+    const auto d = dot(a, b);
+    const auto result = d > T(0);
+    return result;
+}
+
+template<typename T>
 struct ortho_normal_base {
     vector<T, 3> tangent, bitangent, normal;
 
