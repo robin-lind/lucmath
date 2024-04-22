@@ -133,6 +133,13 @@ struct vector<T, 2> {
         return result;
     }
 
+    template<typename S>
+    constexpr auto swizzle() const
+    {
+        const auto result = S{}(*this);
+        return result;
+    }
+
     T x, y;
 };
 
@@ -169,6 +176,13 @@ struct vector<T, 3> {
     auto as_array() const
     {
         const std::array<T, 3>& result{ x, y, z };
+        return result;
+    }
+
+    template<typename S>
+    constexpr auto swizzle() const
+    {
+        const auto result = S{}(*this);
         return result;
     }
 
@@ -220,6 +234,13 @@ struct vector<T, 4> {
     auto as_array() const
     {
         const std::array<T, 4>& result{ x, y, z, w };
+        return result;
+    }
+
+    template<typename S>
+    constexpr auto swizzle() const
+    {
+        const auto result = S{}(*this);
         return result;
     }
 
